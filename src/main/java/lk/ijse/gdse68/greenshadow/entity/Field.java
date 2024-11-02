@@ -30,7 +30,7 @@ public class Field {
     @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Crop> crops;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "field_staff",
             joinColumns = @JoinColumn(name = "fieldCode"),

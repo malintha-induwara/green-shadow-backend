@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +21,8 @@ public class CropDetail {
     @Id
     @CustomGenerator(prefix ="CROP-DETAIL-" )
     private String logCode;
+
+    @CreationTimestamp
     private LocalDate logDate;
     private String logDetail;
     private String observedImage;
