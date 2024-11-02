@@ -1,6 +1,7 @@
 package lk.ijse.gdse68.greenshadow.util;
 
 
+import lk.ijse.gdse68.greenshadow.annotation.CustomGenerator;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.generator.BeforeExecutionGenerator;
 import org.hibernate.generator.EventType;
@@ -28,7 +29,7 @@ public class IdGenerator implements BeforeExecutionGenerator {
             }
         }
         if (idField == null) {
-            throw new IllegalStateException("No field found with PrefixedId annotation");
+            throw new IllegalStateException("No field found with CustomGenerator annotation");
         }
 
         CustomGenerator annotation = idField.getAnnotation(CustomGenerator.class);

@@ -1,5 +1,6 @@
-package lk.ijse.gdse68.greenshadow.util;
+package lk.ijse.gdse68.greenshadow.annotation;
 
+import lk.ijse.gdse68.greenshadow.util.IdGenerator;
 import org.hibernate.annotations.IdGeneratorType;
 
 import java.lang.annotation.ElementType;

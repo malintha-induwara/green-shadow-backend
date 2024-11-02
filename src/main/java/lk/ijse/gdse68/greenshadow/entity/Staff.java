@@ -3,7 +3,7 @@ package lk.ijse.gdse68.greenshadow.entity;
 import jakarta.persistence.*;
 import lk.ijse.gdse68.greenshadow.enums.Gender;
 import lk.ijse.gdse68.greenshadow.enums.Role;
-import lk.ijse.gdse68.greenshadow.util.CustomGenerator;
+import lk.ijse.gdse68.greenshadow.annotation.CustomGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
