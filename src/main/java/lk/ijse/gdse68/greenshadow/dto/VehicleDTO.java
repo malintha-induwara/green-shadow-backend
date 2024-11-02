@@ -17,6 +17,6 @@ public class VehicleDTO {
     private String fuelType;
     private VehicleStatus status;
     private String remarks;
-    private String staffId;
+    private String staff;
 }
 

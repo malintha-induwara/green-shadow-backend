@@ -3,8 +3,11 @@ package lk.ijse.gdse68.greenshadow.util;
 import lk.ijse.gdse68.greenshadow.dto.VehicleDTO;
 import lk.ijse.gdse68.greenshadow.entity.Vehicle;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class Mapper {
@@ -24,5 +27,8 @@ public class Mapper {
         return modelMapper.map(vehicle, VehicleDTO.class);
     }
 
+    public List<VehicleDTO> convertToVehicleDTOList(List<Vehicle> vehicles) {
+        return modelMapper.map(vehicles, new TypeToken<List<VehicleDTO>>(){}.getType());
+    }
 }
 
