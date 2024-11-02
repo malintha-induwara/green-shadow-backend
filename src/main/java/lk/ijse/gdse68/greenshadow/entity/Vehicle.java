@@ -2,6 +2,7 @@ package lk.ijse.gdse68.greenshadow.entity;
 
 import jakarta.persistence.*;
 import lk.ijse.gdse68.greenshadow.enums.VehicleStatus;
+import lk.ijse.gdse68.greenshadow.util.CustomGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.Setter;
 public class Vehicle {
 
     @Id
+    @CustomGenerator(prefix ="CAR-" )
     private String vehicleCode;
     private String licensePlateNumber;
     private String vehicleCategory;

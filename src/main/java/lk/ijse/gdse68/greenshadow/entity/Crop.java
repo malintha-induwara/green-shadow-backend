@@ -1,12 +1,14 @@
 package lk.ijse.gdse68.greenshadow.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lk.ijse.gdse68.greenshadow.util.CustomGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 @Getter
@@ -16,6 +18,7 @@ import java.util.List;
 public class Crop {
 
     @Id
+    @CustomGenerator(prefix ="CROP-" )
     private String cropCode;
     private String cropCommonName;
     private String cropScientificName;
