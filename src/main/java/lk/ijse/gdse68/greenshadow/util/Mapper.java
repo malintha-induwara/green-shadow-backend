@@ -2,9 +2,11 @@ package lk.ijse.gdse68.greenshadow.util;
 
 import lk.ijse.gdse68.greenshadow.dto.CropDTO;
 import lk.ijse.gdse68.greenshadow.dto.FieldDTO;
+import lk.ijse.gdse68.greenshadow.dto.StaffDTO;
 import lk.ijse.gdse68.greenshadow.dto.VehicleDTO;
 import lk.ijse.gdse68.greenshadow.entity.Crop;
 import lk.ijse.gdse68.greenshadow.entity.Field;
+import lk.ijse.gdse68.greenshadow.entity.Staff;
 import lk.ijse.gdse68.greenshadow.entity.Vehicle;
 import org.modelmapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,5 +67,11 @@ public class Mapper {
     public FieldDTO<String> convertToFieldDTO(Field field) { return modelMapper.map(field, new TypeToken<FieldDTO<String>>() {}.getType());}
 
     public List<FieldDTO<String>> convertToFieldDTOList(List<Field> fields) { return modelMapper.map(fields, new TypeToken<List<FieldDTO<String>>>() {}.getType());}
+
+    public Staff convertToStaffEntity(StaffDTO staffDTO) { return modelMapper.map(staffDTO, Staff.class);}
+
+    public StaffDTO convertToStaffDTO(Staff referenceById) { return modelMapper.map(referenceById, StaffDTO.class);}
+
+    public List<StaffDTO> convertToStaffDTOList(List<Staff> staff) {return modelMapper.map(staff, new TypeToken<List<StaffDTO>>() {}.getType()); }
 }
 

@@ -6,11 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.geo.Point;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class FieldDTO<T> {
+public class FieldDTO<T>  implements Serializable {
     private String fieldCode;
     private String fieldName;
     private Point fieldLocation;
