@@ -1,13 +1,7 @@
 package lk.ijse.gdse68.greenshadow.util;
 
-import lk.ijse.gdse68.greenshadow.dto.CropDTO;
-import lk.ijse.gdse68.greenshadow.dto.FieldDTO;
-import lk.ijse.gdse68.greenshadow.dto.StaffDTO;
-import lk.ijse.gdse68.greenshadow.dto.VehicleDTO;
-import lk.ijse.gdse68.greenshadow.entity.Crop;
-import lk.ijse.gdse68.greenshadow.entity.Field;
-import lk.ijse.gdse68.greenshadow.entity.Staff;
-import lk.ijse.gdse68.greenshadow.entity.Vehicle;
+import lk.ijse.gdse68.greenshadow.dto.*;
+import lk.ijse.gdse68.greenshadow.entity.*;
 import org.modelmapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,7 +30,23 @@ public class Mapper {
                 map().setField(source.getField().getFieldCode());
             }
         };
+
+        PropertyMap<Equipment,EquipmentDTO> equipmentMap = new PropertyMap<>() {
+            @Override
+            protected void configure() {
+                map().setEquipmentId(source.getEquipmentId());
+                map().setName(source.getName());
+                map().setStatus(source.getStatus());
+                map().setEquipmentType(source.getEquipmentType());
+                map().setField(source.getField().getFieldCode());
+                map().setStaff(source.getStaff().getStaffId());
+            }
+        };
+
+
+
         modelMapper.addMappings(cropMap);
+        modelMapper.addMappings(equipmentMap);
 
         modelMapper.typeMap(CropDTO.class, Crop.class).addMappings(mapper -> mapper.skip(Crop::setImage));
         modelMapper.typeMap(FieldDTO.class, Field.class).addMappings(mapper -> mapper.skip(Field::setFieldImage1));
@@ -73,5 +83,11 @@ public class Mapper {
     public StaffDTO convertToStaffDTO(Staff referenceById) { return modelMapper.map(referenceById, StaffDTO.class);}
 
     public List<StaffDTO> convertToStaffDTOList(List<Staff> staff) {return modelMapper.map(staff, new TypeToken<List<StaffDTO>>() {}.getType()); }
+
+    public Equipment convertToEquipmentEntity(EquipmentDTO equipmentDTO) { return modelMapper.map(equipmentDTO, Equipment.class);}
+
+    public EquipmentDTO convertToEquipmentDTO(Equipment equipmentId) {return modelMapper.map(equipmentId, EquipmentDTO.class);}
+
+    public List<EquipmentDTO> convertToEquipmentDTOList(List<Equipment> equipments) {return modelMapper.map(equipments, new TypeToken<List<EquipmentDTO>>() {}.getType());}
 }
 
