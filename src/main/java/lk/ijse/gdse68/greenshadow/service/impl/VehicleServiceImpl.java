@@ -19,7 +19,6 @@ import java.util.Optional;
 
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class VehicleServiceImpl implements VehicleService {
 
@@ -30,6 +29,7 @@ public class VehicleServiceImpl implements VehicleService {
     private final Mapper mapper;
 
     @Override
+    @Transactional
     public void saveVehicle(VehicleDTO vehicleDTO) {
         try {
             Vehicle tempVehicle = mapper.convertToVehicleEntity(vehicleDTO);
@@ -48,6 +48,7 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
+    @Transactional
     public void updateVehicle(String vehicleId, VehicleDTO vehicleDTO) {
         Optional<Vehicle> tempVehicle = vehicleRepository.findById(vehicleId);
 
@@ -68,7 +69,7 @@ public class VehicleServiceImpl implements VehicleService {
                 } else {
                     throw new StaffNotFoundException("Staff not found");
                 }
-            }else {
+            } else {
                 vehicle.setStaff(null);
             }
 
