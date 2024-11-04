@@ -1,6 +1,5 @@
 package lk.ijse.gdse68.greenshadow.dto;
 
-import lk.ijse.gdse68.greenshadow.enums.VehicleStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +16,7 @@ public class VehicleDTO implements Serializable {
     private String licensePlateNumber;
     private String vehicleCategory;
     private String fuelType;
-    private VehicleStatus status;
+    private String  status;
     private String remarks;
     private String staff;
 }

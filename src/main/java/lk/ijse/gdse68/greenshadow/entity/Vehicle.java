@@ -1,7 +1,6 @@
 package lk.ijse.gdse68.greenshadow.entity;
 
 import jakarta.persistence.*;
-import lk.ijse.gdse68.greenshadow.enums.VehicleStatus;
 import lk.ijse.gdse68.greenshadow.annotation.CustomGenerator;
 import lombok.*;
 
@@ -19,9 +18,7 @@ public class Vehicle {
     private String licensePlateNumber;
     private String vehicleCategory;
     private String fuelType;
-
-    @Enumerated(EnumType.STRING)
-    private VehicleStatus status;
+    private String status;
     private String remarks;
 
     @ManyToOne
