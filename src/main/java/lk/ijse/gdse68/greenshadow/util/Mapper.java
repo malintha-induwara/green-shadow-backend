@@ -89,5 +89,9 @@ public class Mapper {
     public EquipmentDTO convertToEquipmentDTO(Equipment equipmentId) {return modelMapper.map(equipmentId, EquipmentDTO.class);}
 
     public List<EquipmentDTO> convertToEquipmentDTOList(List<Equipment> equipments) {return modelMapper.map(equipments, new TypeToken<List<EquipmentDTO>>() {}.getType());}
+
+    public User convertToUserEntity(UserDTO userDTO) {return modelMapper.map(userDTO, User.class);}
+
+    public UserDTO convertToUserDTO(User referenceById) {return modelMapper.map(referenceById, UserDTO.class);}
 }
 
