@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class Mapper {
@@ -17,6 +19,28 @@ public class Mapper {
     @Autowired
     public void setModelMapper(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
+
+
+        //Converters
+        Converter<List<Field>, List<String>> fieldToIdConverter = ctx ->
+                ctx.getSource().stream()
+                        .map(Field::getFieldCode)
+                        .collect(Collectors.toList());
+
+        Converter<List<Crop>, List<String>> cropToIdConverter = ctx ->
+                ctx.getSource().stream()
+                        .map(Crop::getCropCode)
+                        .collect(Collectors.toList());
+
+        Converter<List<Staff>, List<String>> staffToIdConverter = ctx ->
+                ctx.getSource().stream()
+                        .map(Staff::getStaffId)
+                        .collect(Collectors.toList());
+
+        Converter<List<Vehicle>, List<String>> vehicleToIdConverter = ctx ->
+                ctx.getSource().stream()
+                        .map(Vehicle::getVehicleCode)
+                        .collect(Collectors.toList());
 
 
         PropertyMap<Crop, CropDTO<String>> cropMap = new PropertyMap<>() {
@@ -44,15 +68,59 @@ public class Mapper {
         };
 
 
-
         modelMapper.addMappings(cropMap);
         modelMapper.addMappings(equipmentMap);
+
+        modelMapper.createTypeMap(CropDetail.class, CropDetailDTO.class)
+                .addMappings(mapper -> {
+                    mapper.map(CropDetail::getLogCode, CropDetailDTO<String>::setLogCode);
+                    mapper.map(CropDetail::getLogDate, CropDetailDTO<String>::setLogDate);
+                    mapper.map(CropDetail::getLogDetail, CropDetailDTO<String>::setLogDetail);
+                    mapper.skip(CropDetail::getObservedImage, CropDetailDTO<String>::setObservedImage);
+                    mapper.using(fieldToIdConverter).map(CropDetail::getFields, CropDetailDTO<String>::setFieldCodes);
+                    mapper.using(cropToIdConverter).map(CropDetail::getCrops, CropDetailDTO<String>::setCropCodes);
+                    mapper.using(staffToIdConverter).map(CropDetail::getStaff, CropDetailDTO<String>::setStaffIds);
+                });
+
+
+        modelMapper.createTypeMap(Field.class, FieldDTO.class)
+                .addMappings(mapper -> {
+                    mapper.map(Field::getFieldCode, FieldDTO<String>::setFieldCode);
+                    mapper.map(Field::getFieldName, FieldDTO<String>::setFieldName);
+                    mapper.map(Field::getFieldLocation, FieldDTO<String>::setFieldLocation);
+                    mapper.map(Field::getExtentSize, FieldDTO<String>::setExtentSize);
+                    mapper.skip(Field::getFieldImage1, FieldDTO<String>::setFieldImage1);
+                    mapper.skip(Field::getFieldImage2, FieldDTO<String>::setFieldImage2);
+                    mapper.using(cropToIdConverter).map(Field::getCrops, FieldDTO<String>::setCrops);
+                    mapper.using(staffToIdConverter).map(Field::getStaff, FieldDTO<String>::setStaff);
+                });
+
+        modelMapper.createTypeMap(Staff.class, StaffDTO.class)
+                .addMappings(mapper -> {
+                    mapper.map(Staff::getStaffId, StaffDTO::setStaffId);
+                    mapper.map(Staff::getFirstName, StaffDTO::setFirstName);
+                    mapper.map(Staff::getLastName, StaffDTO::setLastName);
+                    mapper.map(Staff::getDesignation, StaffDTO::setDesignation);
+                    mapper.map(Staff::getGender, StaffDTO::setGender);
+                    mapper.map(Staff::getJoinedDate, StaffDTO::setJoinedDate);
+                    mapper.map(Staff::getDob, StaffDTO::setDob);
+                    mapper.map(Staff::getAddressLine01, StaffDTO::setAddressLine01);
+                    mapper.map(Staff::getAddressLine02, StaffDTO::setAddressLine02);
+                    mapper.map(Staff::getAddressLine03, StaffDTO::setAddressLine03);
+                    mapper.map(Staff::getAddressLine05, StaffDTO::setAddressLine05);
+                    mapper.map(Staff::getContactNo, StaffDTO::setContactNo);
+                    mapper.map(Staff::getRole, StaffDTO::setRole);
+                    mapper.using(vehicleToIdConverter).map(Staff::getVehicles, StaffDTO::setVehicles);
+                    mapper.using(fieldToIdConverter).map(Staff::getFields, StaffDTO::setFields);
+                });
+
+
+
 
         modelMapper.typeMap(CropDTO.class, Crop.class).addMappings(mapper -> mapper.skip(Crop::setImage));
         modelMapper.typeMap(FieldDTO.class, Field.class).addMappings(mapper -> mapper.skip(Field::setFieldImage1));
         modelMapper.typeMap(FieldDTO.class, Field.class).addMappings(mapper -> mapper.skip(Field::setFieldImage2));
-        modelMapper.typeMap(Field.class, FieldDTO.class).addMappings(mapper -> mapper.skip(FieldDTO<String>::setFieldImage1));
-        modelMapper.typeMap(Field.class, FieldDTO.class).addMappings(mapper -> mapper.skip(FieldDTO<String>::setFieldImage2));
+        modelMapper.typeMap(CropDetailDTO.class, CropDetail.class).addMappings(mapper -> mapper.skip(CropDetail::setObservedImage));
     }
 
 
@@ -93,5 +161,11 @@ public class Mapper {
     public User convertToUserEntity(UserDTO userDTO) {return modelMapper.map(userDTO, User.class);}
 
     public UserDTO convertToUserDTO(User referenceById) {return modelMapper.map(referenceById, UserDTO.class);}
+
+    public CropDetail convertToCropDetailEntity(CropDetailDTO<MultipartFile> cropDetailDTO) {return modelMapper.map(cropDetailDTO, CropDetail.class);}
+
+    public CropDetailDTO<String> convertToCropDetailDTO(CropDetail cropDetail) {return modelMapper.map(cropDetail, new TypeToken<CropDetailDTO<String>>() {}.getType());}
+
+    public List<CropDetailDTO<String>> convertToCropDetailDTOList(List<CropDetail> cropDetails) {return modelMapper.map(cropDetails, new TypeToken<List<CropDetailDTO<String>>>() {}.getType());}
 }
 

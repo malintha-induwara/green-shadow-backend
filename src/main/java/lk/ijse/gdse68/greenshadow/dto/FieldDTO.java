@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.data.geo.Point;
 
 import java.io.Serializable;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,5 +20,7 @@ public class FieldDTO<T>  implements Serializable {
     private double extentSize;
     private T fieldImage1;
     private T fieldImage2;
+    private List<String> crops;
+    private List<String> staff;
 }
 

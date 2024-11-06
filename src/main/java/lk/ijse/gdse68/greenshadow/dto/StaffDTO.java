@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,5 +31,7 @@ public class StaffDTO implements Serializable {
     private String contactNo;
     private String email;
     private Role role;
+    private List<String> vehicles;
+    private List<String> fields;
 }
 

@@ -34,10 +34,16 @@ public class FieldController {
                                           @RequestPart("fieldImage1") MultipartFile fieldImage1,
                                           @RequestPart("fieldImage2") MultipartFile fieldImage2) {
         log.info("Received request to save field: {}", fieldName);
-
         try {
-            Point fieldLocation = new Point(Double.parseDouble(latitude),Double.parseDouble(longitude));
-            FieldDTO<MultipartFile> fieldDTO = new FieldDTO<>(null, fieldName, fieldLocation,Double.parseDouble(extentSize), fieldImage1, fieldImage2);
+            FieldDTO<MultipartFile> fieldDTO = new FieldDTO<>();
+            Point fieldLocation = new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
+
+            fieldDTO.setFieldName(fieldName);
+            fieldDTO.setFieldLocation(fieldLocation);
+            fieldDTO.setExtentSize(Double.parseDouble(extentSize));
+            fieldDTO.setFieldImage1(fieldImage1);
+            fieldDTO.setFieldImage2(fieldImage2);
+
             fieldService.saveField(fieldDTO);
             log.info("Field saved successfully: {}", fieldName);
             return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -68,8 +74,15 @@ public class FieldController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
             try {
-                Point fieldLocation = new Point(Double.parseDouble(latitude),Double.parseDouble(longitude));
-                FieldDTO<MultipartFile> fieldDTO = new FieldDTO<>(fieldCode, fieldName, fieldLocation,Double.parseDouble(extentSize), fieldImage1, fieldImage2);
+                Point fieldLocation = new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
+                FieldDTO<MultipartFile> fieldDTO = new FieldDTO<>();
+                fieldDTO.setFieldCode(fieldCode);
+                fieldDTO.setFieldName(fieldName);
+                fieldDTO.setFieldLocation(fieldLocation);
+                fieldDTO.setExtentSize(Double.parseDouble(extentSize));
+                fieldDTO.setFieldImage1(fieldImage1);
+                fieldDTO.setFieldImage2(fieldImage2);
+
                 fieldService.updateField(fieldCode, fieldDTO);
                 log.info("Field updated successfully: {}", fieldCode);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
