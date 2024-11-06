@@ -20,20 +20,6 @@ public class UserController {
     private final UserService userService;
 
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveUser(@RequestBody UserDTO userDTO) {
-        if (userDTO == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                userService.saveUser(userDTO);
-                return ResponseEntity.status(HttpStatus.CREATED).build();
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-        }
-    }
-
     @PutMapping(path = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateUser(@PathVariable("userId") String userId, @RequestBody UserDTO userDTO) {
         if (userId == null) {

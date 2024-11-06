@@ -8,6 +8,7 @@ import lk.ijse.gdse68.greenshadow.repository.UserRepository;
 import lk.ijse.gdse68.greenshadow.service.UserService;
 import lk.ijse.gdse68.greenshadow.util.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,14 +22,6 @@ public class UserServiceImpl implements UserService {
 
     private final Mapper mapper;
 
-    @Override
-    public void saveUser(UserDTO userDTO) {
-        try {
-            userRepository.save(mapper.convertToUserEntity(userDTO));
-        } catch (Exception e) {
-            throw new DataPersistFailedException("Failed to save the user");
-        }
-    }
 
     @Override
     @Transactional
@@ -59,6 +52,13 @@ public class UserServiceImpl implements UserService {
         } else {
          throw new UserNotFoundException("User not found");
         }
+    }
+
+    @Override
+    public UserDetailsService userDetailsService() {
+        return email ->
+                userRepository.findById(email)
+                        .orElseThrow(()-> new UserNotFoundException("User Not found"));
     }
 }
 
