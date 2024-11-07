@@ -8,12 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/equipment")
+@PreAuthorize("hasAnyRole('MANAGER','ADMINISTRATIVE')")
 @RequiredArgsConstructor
 @Slf4j
 public class EquipmentController {
@@ -39,6 +41,7 @@ public class EquipmentController {
         }
     }
 
+
     @PutMapping(path = "/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateEquipment(@PathVariable("equipmentId") String equipmentId, @RequestBody EquipmentDTO equipmentDTO) {
         log.info("Received request to update equipment: {}", equipmentId);
@@ -59,6 +62,7 @@ public class EquipmentController {
             }
         }
     }
+
 
     @GetMapping(value = "/{equipmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EquipmentDTO> searchEquipment(@PathVariable("equipmentId") String equipmentId) {
@@ -94,6 +98,7 @@ public class EquipmentController {
         }
     }
 
+
     @DeleteMapping(path = "/{equipmentId}")
     public ResponseEntity<Void> deleteEquipment(@PathVariable("equipmentId") String equipmentId) {
         log.info("Received request to delete equipment: {}", equipmentId);
@@ -114,15 +119,5 @@ public class EquipmentController {
             }
         }
     }
-
-
-
-
-
-
-
-
-
-
 }
 
