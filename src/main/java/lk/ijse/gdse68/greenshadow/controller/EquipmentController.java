@@ -1,5 +1,6 @@
 package lk.ijse.gdse68.greenshadow.controller;
 
+import jakarta.validation.Valid;
 import lk.ijse.gdse68.greenshadow.dto.EquipmentDTO;
 import lk.ijse.gdse68.greenshadow.exception.EquipmentNotFoundException;
 import lk.ijse.gdse68.greenshadow.service.EquipmentService;
@@ -23,7 +24,7 @@ public class EquipmentController {
     private final EquipmentService equipmentService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveEquipment(@RequestBody EquipmentDTO equipmentDTO) {
+    public ResponseEntity<Void> saveEquipment(@Valid @RequestBody EquipmentDTO equipmentDTO) {
         log.info("Received request to save equipment: {}", equipmentDTO);
 
         if (equipmentDTO == null) {
@@ -43,7 +44,7 @@ public class EquipmentController {
 
 
     @PutMapping(path = "/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateEquipment(@PathVariable("equipmentId") String equipmentId, @RequestBody EquipmentDTO equipmentDTO) {
+    public ResponseEntity<Void> updateEquipment(@PathVariable("equipmentId") String equipmentId,@Valid @RequestBody EquipmentDTO equipmentDTO) {
         log.info("Received request to update equipment: {}", equipmentId);
         if (equipmentId == null) {
             log.warn("Received null equipmentId for update");

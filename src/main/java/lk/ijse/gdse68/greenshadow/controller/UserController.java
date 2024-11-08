@@ -1,6 +1,7 @@
 package lk.ijse.gdse68.greenshadow.controller;
 
 
+import jakarta.validation.Valid;
 import lk.ijse.gdse68.greenshadow.dto.UserDTO;
 import lk.ijse.gdse68.greenshadow.exception.UserNotFoundException;
 import lk.ijse.gdse68.greenshadow.service.UserService;
@@ -23,7 +24,7 @@ public class UserController {
 
 
     @PutMapping(path = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateUser(@PathVariable("userId") String userId, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<Void> updateUser(@PathVariable("userId") String userId,@Valid @RequestBody UserDTO userDTO) {
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {

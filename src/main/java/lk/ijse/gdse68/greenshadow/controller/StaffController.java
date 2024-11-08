@@ -1,6 +1,7 @@
 package lk.ijse.gdse68.greenshadow.controller;
 
 
+import jakarta.validation.Valid;
 import lk.ijse.gdse68.greenshadow.dto.StaffDTO;
 import lk.ijse.gdse68.greenshadow.exception.StaffNotFoundException;
 import lk.ijse.gdse68.greenshadow.service.StaffService;
@@ -24,7 +25,7 @@ public class StaffController {
     private final StaffService staffService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveStaff(@RequestBody StaffDTO staffDTO) {
+    public ResponseEntity<Void> saveStaff(@Valid @RequestBody StaffDTO staffDTO) {
         log.info("Received request to save staff: {}", staffDTO);
 
         if (staffDTO == null) {
@@ -43,7 +44,7 @@ public class StaffController {
     }
 
     @PutMapping(path = "/{staffId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateStaff(@PathVariable("staffId") String staffId, @RequestBody StaffDTO staffDTO) {
+    public ResponseEntity<Void> updateStaff(@PathVariable("staffId") String staffId,@Valid @RequestBody StaffDTO staffDTO) {
         log.info("Received request to update staff: {}", staffId);
         if (staffId == null) {
             log.warn("Received null staffId for update");

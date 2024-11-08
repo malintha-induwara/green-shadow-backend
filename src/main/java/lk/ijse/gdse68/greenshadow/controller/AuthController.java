@@ -1,5 +1,6 @@
 package lk.ijse.gdse68.greenshadow.controller;
 
+import jakarta.validation.Valid;
 import lk.ijse.gdse68.greenshadow.dto.UserDTO;
 import lk.ijse.gdse68.greenshadow.exception.DataPersistFailedException;
 import lk.ijse.gdse68.greenshadow.jwtmodels.JwtAuthResponse;
@@ -18,7 +19,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping(value = "signUp", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JwtAuthResponse> signUp(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<JwtAuthResponse> signUp(@Valid @RequestBody UserDTO userDTO) {
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
@@ -33,7 +34,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "signIn")
-    public ResponseEntity<JwtAuthResponse> signIn(@RequestBody SignIn signIn) {
+    public ResponseEntity<JwtAuthResponse> signIn(@Valid @RequestBody SignIn signIn) {
         return ResponseEntity.ok(authService.signIn(signIn));
     }
 

@@ -1,5 +1,6 @@
 package lk.ijse.gdse68.greenshadow.controller;
 
+import jakarta.validation.Valid;
 import lk.ijse.gdse68.greenshadow.dto.VehicleDTO;
 import lk.ijse.gdse68.greenshadow.exception.StaffNotFoundException;
 import lk.ijse.gdse68.greenshadow.exception.VehicleNotFoundException;
@@ -24,7 +25,7 @@ public class VehicleController {
     private final VehicleService vehicleService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveVehicle(@RequestBody VehicleDTO vehicleDTO) {
+    public ResponseEntity<Void> saveVehicle(@Valid @RequestBody VehicleDTO vehicleDTO) {
         log.info("Received request to save vehicle: {}", vehicleDTO);
 
         if (vehicleDTO == null) {
@@ -43,7 +44,7 @@ public class VehicleController {
     }
 
     @PutMapping(path = "/{vehicleId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateVehicle(@PathVariable("vehicleId") String vehicleId, @RequestBody VehicleDTO vehicleDTO) {
+    public ResponseEntity<Void> updateVehicle(@PathVariable("vehicleId") String vehicleId,@Valid @RequestBody VehicleDTO vehicleDTO) {
         log.info("Received request to update vehicle: {}", vehicleId);
         if (vehicleId == null) {
             log.warn("Received null vehicleId for update");
