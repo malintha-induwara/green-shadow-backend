@@ -1,6 +1,7 @@
 package lk.ijse.gdse68.greenshadow.config;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,6 +38,11 @@ public class JWTConfig extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("{\"error\": \"token_invalid\", \"message\": \"The token has expired.\"}");
+                response.getWriter().flush();
+                return;
+            }catch (SignatureException e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\": \"token_invalid\", \"message\": \"The token is invalid.\"}");
                 response.getWriter().flush();
                 return;
             }
