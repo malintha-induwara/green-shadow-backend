@@ -34,7 +34,7 @@ public class IdGenerator implements BeforeExecutionGenerator {
 
         CustomGenerator annotation = idField.getAnnotation(CustomGenerator.class);
         String prefix = annotation.prefix();
-        return prefix + UUID.randomUUID();
+        return prefix + UUID.randomUUID().toString().substring(0, 5);
     }
 }
 

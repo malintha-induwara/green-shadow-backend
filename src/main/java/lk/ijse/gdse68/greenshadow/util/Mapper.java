@@ -121,6 +121,7 @@ public class Mapper {
         modelMapper.typeMap(FieldDTO.class, Field.class).addMappings(mapper -> mapper.skip(Field::setFieldImage1));
         modelMapper.typeMap(FieldDTO.class, Field.class).addMappings(mapper -> mapper.skip(Field::setFieldImage2));
         modelMapper.typeMap(CropDetailDTO.class, CropDetail.class).addMappings(mapper -> mapper.skip(CropDetail::setObservedImage));
+        modelMapper.typeMap(User.class, UserDTO.class).addMappings(mapper -> mapper.skip(UserDTO::setPassword));
     }
 
 
@@ -161,6 +162,8 @@ public class Mapper {
     public User convertToUserEntity(UserDTO userDTO) {return modelMapper.map(userDTO, User.class);}
 
     public UserDTO convertToUserDTO(User referenceById) {return modelMapper.map(referenceById, UserDTO.class);}
+
+    public List<UserDTO> convertToUserDTOList(List<User> users) {return modelMapper.map(users, new TypeToken<List<UserDTO>>() {}.getType());}
 
     public CropDetail convertToCropDetailEntity(CropDetailDTO<MultipartFile> cropDetailDTO) {return modelMapper.map(cropDetailDTO, CropDetail.class);}
 
