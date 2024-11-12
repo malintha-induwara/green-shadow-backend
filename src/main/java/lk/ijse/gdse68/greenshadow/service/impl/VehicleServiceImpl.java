@@ -30,7 +30,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     @Transactional
-    public void saveVehicle(VehicleDTO vehicleDTO) {
+    public VehicleDTO saveVehicle(VehicleDTO vehicleDTO) {
         try {
             Vehicle tempVehicle = mapper.convertToVehicleEntity(vehicleDTO);
             if (vehicleDTO.getStaff() != null) {
@@ -41,7 +41,7 @@ public class VehicleServiceImpl implements VehicleService {
                     throw new StaffNotFoundException("Staff not found");
                 }
             }
-            vehicleRepository.save(tempVehicle);
+            return mapper.convertToVehicleDTO(vehicleRepository.save(tempVehicle));
         } catch (Exception e) {
             throw new DataPersistFailedException("Failed to save the vehicle");
         }
@@ -49,8 +49,8 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     @Transactional
-    public void updateVehicle(String vehicleId, VehicleDTO vehicleDTO) {
-        Optional<Vehicle> tempVehicle = vehicleRepository.findById(vehicleId);
+    public VehicleDTO updateVehicle(String vehicleId, VehicleDTO vehicleDTO) {
+            Optional<Vehicle> tempVehicle = vehicleRepository.findById(vehicleId);
 
         if (tempVehicle.isPresent()) {
 
@@ -72,7 +72,7 @@ public class VehicleServiceImpl implements VehicleService {
             } else {
                 vehicle.setStaff(null);
             }
-
+            return mapper.convertToVehicleDTO(tempVehicle.get());
         } else {
             throw new VehicleNotFoundException("Vehicle not found");
         }

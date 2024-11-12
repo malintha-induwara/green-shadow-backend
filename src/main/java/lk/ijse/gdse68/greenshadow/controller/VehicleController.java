@@ -20,12 +20,13 @@ import java.util.List;
 @PreAuthorize("hasAnyRole('MANAGER','ADMINISTRATIVE')")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin("*")
 public class VehicleController {
 
     private final VehicleService vehicleService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveVehicle(@Valid @RequestBody VehicleDTO vehicleDTO) {
+    public ResponseEntity<VehicleDTO> saveVehicle(@Valid @RequestBody VehicleDTO vehicleDTO) {
         log.info("Received request to save vehicle: {}", vehicleDTO);
 
         if (vehicleDTO == null) {
@@ -33,9 +34,9 @@ public class VehicleController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
             try {
-                vehicleService.saveVehicle(vehicleDTO);
-                log.info("Vehicle saved successfully: {}", vehicleDTO.getVehicleCode());
-                return ResponseEntity.status(HttpStatus.CREATED).build();
+                VehicleDTO savedVehicle = vehicleService.saveVehicle(vehicleDTO);
+                log.info("Vehicle saved successfully: {}", savedVehicle.getVehicleCode());
+                return ResponseEntity.status(HttpStatus.CREATED).body(savedVehicle);
             } catch (Exception e) {
                 log.error("Unexpected error while saving vehicle: {}", vehicleDTO.getVehicleCode(), e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -44,16 +45,16 @@ public class VehicleController {
     }
 
     @PutMapping(path = "/{vehicleId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateVehicle(@PathVariable("vehicleId") String vehicleId,@Valid @RequestBody VehicleDTO vehicleDTO) {
+    public ResponseEntity<VehicleDTO> updateVehicle(@PathVariable("vehicleId") String vehicleId,@Valid @RequestBody VehicleDTO vehicleDTO) {
         log.info("Received request to update vehicle: {}", vehicleId);
         if (vehicleId == null) {
             log.warn("Received null vehicleId for update");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
             try {
-                vehicleService.updateVehicle(vehicleId, vehicleDTO);
+                VehicleDTO updatedVehicle = vehicleService.updateVehicle(vehicleId, vehicleDTO);
                 log.info("Vehicle updated successfully: {}", vehicleId);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                return ResponseEntity.status(HttpStatus.OK).body(updatedVehicle);
             } catch (VehicleNotFoundException e) {
                 log.warn("Vehicle not found for update: {}", vehicleId);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
