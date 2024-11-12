@@ -31,13 +31,13 @@ public class CropServiceImpl implements CropService {
 
     @Override
     @Transactional
-    public void saveCrop(CropDTO<MultipartFile> cropDTO) {
+    public CropDTO<String> saveCrop(CropDTO<MultipartFile> cropDTO) {
 
         String imageName = imageUtil.saveImage(ImageType.CROP, cropDTO.getImage());
         Crop tempCrop = mapper.convertToCropEntity(cropDTO);
         tempCrop.setImage(imageName);
 
-        if (cropDTO.getField() != null) {
+        if (!cropDTO.getField().equals("null")) {
             Optional<Field> tempField = fieldRepository.findById(cropDTO.getField());
             if (tempField.isPresent()) {
                 tempCrop.setField(tempField.get());
@@ -47,7 +47,10 @@ public class CropServiceImpl implements CropService {
         }
 
         try {
-            cropRepository.save(tempCrop);
+            Crop saveCrop = cropRepository.save(tempCrop);
+            CropDTO<String> cropDTOS = mapper.convertToCropDTO(saveCrop);
+            cropDTOS.setImage(imageUtil.getImage(saveCrop.getImage()));
+            return cropDTOS;
         } catch (Exception e) {
             throw new DataPersistFailedException("Failed to save the crop");
         }
@@ -55,7 +58,7 @@ public class CropServiceImpl implements CropService {
 
     @Override
     @Transactional
-    public void updateCrop(String cropId, CropDTO<MultipartFile> cropDTO) {
+    public CropDTO<String> updateCrop(String cropId, CropDTO<MultipartFile> cropDTO) {
 
         Optional<Crop> tempCrop = cropRepository.findById(cropId);
         if (tempCrop.isPresent()) {
@@ -66,21 +69,26 @@ public class CropServiceImpl implements CropService {
                 imageName = imageUtil.updateImage(tempCrop.get().getImage(), ImageType.CROP, cropDTO.getImage());
             }
 
-            if (cropDTO.getField() != null) {
+            if (!cropDTO.getField().equals("null")) {
                 Optional<Field> tempField = fieldRepository.findById(cropDTO.getField());
                 if (tempField.isPresent()) {
                     tempCrop.get().setField(tempField.get());
                 } else {
                     throw new FieldNotFoundException("Field not found");
                 }
+            } else {
+                tempCrop.get().setField(null);
             }
-
+            
             tempCrop.get().setCropCommonName(cropDTO.getCropCommonName());
             tempCrop.get().setCropScientificName(cropDTO.getCropScientificName());
             tempCrop.get().setImage(imageName);
             tempCrop.get().setCategory(cropDTO.getCategory());
             tempCrop.get().setCropSeason(cropDTO.getCropSeason());
 
+            CropDTO<String> updatedCropDTO = mapper.convertToCropDTO(tempCrop.get());
+            updatedCropDTO.setImage(imageUtil.getImage(tempCrop.get().getImage()));
+            return updatedCropDTO;
         } else {
             throw new CropNotFoundException("Crop not found");
         }

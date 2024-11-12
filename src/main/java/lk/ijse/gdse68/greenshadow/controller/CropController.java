@@ -22,12 +22,13 @@ import java.util.List;
 @PreAuthorize("hasAnyRole('MANAGER','SCIENTIST')")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin("*")
 public class CropController {
 
     private final CropService cropService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> saveCrop(@RequestPart("cropCommonName") String cropCommonName,
+    public ResponseEntity<CropDTO<String>> saveCrop(@RequestPart("cropCommonName") String cropCommonName,
                                          @RequestPart("cropScientificName") String cropScientificName,
                                          @RequestPart("image") MultipartFile image,
                                          @RequestPart("category") String category,
@@ -37,9 +38,9 @@ public class CropController {
 
         try {
             CropDTO<MultipartFile> cropDTO = new CropDTO<>(null, cropCommonName, cropScientificName, image, category, cropSeason, field);
-            cropService.saveCrop(cropDTO);
+            CropDTO<String> savedCrop = cropService.saveCrop(cropDTO);
             log.info("Crop saved successfully: {}", cropCommonName);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedCrop);
         } catch (FieldNotFoundException e) {
             log.warn("Field not found for crop: {}", field);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -56,7 +57,7 @@ public class CropController {
     }
 
     @PutMapping(path = "/{cropCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateCrop(@PathVariable("cropCode") String cropCode,
+    public ResponseEntity<CropDTO<String>> updateCrop(@PathVariable("cropCode") String cropCode,
                                            @RequestPart("cropCommonName") String cropCommonName,
                                            @RequestPart("cropScientificName") String cropScientificName,
                                            @RequestPart("image") MultipartFile image,
@@ -71,9 +72,9 @@ public class CropController {
         } else {
             try {
                 CropDTO<MultipartFile> cropDTO = new CropDTO<>(cropCode, cropCommonName, cropScientificName, image, category, cropSeason, field);
-                cropService.updateCrop(cropCode, cropDTO);
+                CropDTO<String> updatedCropDTO = cropService.updateCrop(cropCode, cropDTO);
                 log.info("Crop updated successfully: {}", cropCode);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                return ResponseEntity.status(HttpStatus.OK).body(updatedCropDTO);
             } catch (CropNotFoundException e) {
                 log.warn("Crop not found for update: {}", cropCode);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

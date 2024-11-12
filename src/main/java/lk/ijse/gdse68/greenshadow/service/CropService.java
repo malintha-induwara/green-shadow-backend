@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface CropService {
 
-    void saveCrop(CropDTO<MultipartFile> cropDTO);
+    CropDTO<String> saveCrop(CropDTO<MultipartFile> cropDTO);
 
-    void updateCrop(String cropId, CropDTO<MultipartFile> cropDTO);
+    CropDTO<String> updateCrop(String cropId, CropDTO<MultipartFile> cropDTO);
 
     void deleteCrop(String cropId);
 
