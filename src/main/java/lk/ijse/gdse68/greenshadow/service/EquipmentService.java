@@ -5,9 +5,9 @@ import lk.ijse.gdse68.greenshadow.dto.EquipmentDTO;
 import java.util.List;
 
 public interface EquipmentService {
-    void saveEquipment(EquipmentDTO equipmentDTO);
+    EquipmentDTO saveEquipment(EquipmentDTO equipmentDTO);
 
-    void updateEquipment(String equipmentId, EquipmentDTO equipmentDTO);
+    EquipmentDTO updateEquipment(String equipmentId, EquipmentDTO equipmentDTO);
 
     void deleteEquipment(String equipmentId);
 

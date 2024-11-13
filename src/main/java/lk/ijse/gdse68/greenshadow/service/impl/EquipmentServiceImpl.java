@@ -35,7 +35,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     @Transactional
-    public void saveEquipment(EquipmentDTO equipmentDTO) {
+    public EquipmentDTO saveEquipment(EquipmentDTO equipmentDTO) {
 
         Equipment tempEquipment = mapper.convertToEquipmentEntity(equipmentDTO);
 
@@ -58,7 +58,8 @@ public class EquipmentServiceImpl implements EquipmentService {
         }
 
         try {
-            equipmentRepository.save(tempEquipment);
+            Equipment savedEquipment = equipmentRepository.save(tempEquipment);
+            return mapper.convertToEquipmentDTO(savedEquipment);
         } catch (Exception e) {
             throw new DataPersistFailedException("Failed to save the equipment");
         }
@@ -66,7 +67,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     @Transactional
-    public void updateEquipment(String equipmentId, EquipmentDTO equipmentDTO) {
+    public EquipmentDTO updateEquipment(String equipmentId, EquipmentDTO equipmentDTO) {
         Optional<Equipment> tempEquipment = equipmentRepository.findById(equipmentId);
         if (tempEquipment.isPresent()){
 
@@ -95,8 +96,11 @@ public class EquipmentServiceImpl implements EquipmentService {
             } else {
                 tempEquipment.get().setField(null);
             }
-        }
 
+            return mapper.convertToEquipmentDTO(tempEquipment.get());
+        }else {
+            throw new EquipmentNotFoundException("Equipment not found");
+        }
     }
 
     @Override

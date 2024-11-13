@@ -19,12 +19,13 @@ import java.util.List;
 @PreAuthorize("hasAnyRole('MANAGER','ADMINISTRATIVE')")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin("*")
 public class EquipmentController {
 
     private final EquipmentService equipmentService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveEquipment(@Valid @RequestBody EquipmentDTO equipmentDTO) {
+    public ResponseEntity<EquipmentDTO> saveEquipment(@Valid @RequestBody EquipmentDTO equipmentDTO) {
         log.info("Received request to save equipment: {}", equipmentDTO);
 
         if (equipmentDTO == null) {
@@ -32,9 +33,9 @@ public class EquipmentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
             try {
-                equipmentService.saveEquipment(equipmentDTO);
+                EquipmentDTO savedEquipment = equipmentService.saveEquipment(equipmentDTO);
                 log.info("Equipment saved successfully: {}", equipmentDTO.getEquipmentId());
-                return ResponseEntity.status(HttpStatus.CREATED).build();
+                return ResponseEntity.status(HttpStatus.CREATED).body(savedEquipment);
             } catch (Exception e) {
                 log.error("Unexpected error while saving equipment: {}", equipmentDTO.getEquipmentId(), e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -44,16 +45,16 @@ public class EquipmentController {
 
 
     @PutMapping(path = "/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateEquipment(@PathVariable("equipmentId") String equipmentId,@Valid @RequestBody EquipmentDTO equipmentDTO) {
+    public ResponseEntity<EquipmentDTO> updateEquipment(@PathVariable("equipmentId") String equipmentId,@Valid @RequestBody EquipmentDTO equipmentDTO) {
         log.info("Received request to update equipment: {}", equipmentId);
         if (equipmentId == null) {
             log.warn("Received null equipmentId for update");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
             try {
-                equipmentService.updateEquipment(equipmentId, equipmentDTO);
+                EquipmentDTO updatedEquipment = equipmentService.updateEquipment(equipmentId, equipmentDTO);
                 log.info("Equipment updated successfully: {}", equipmentId);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                return ResponseEntity.status(HttpStatus.OK).body(updatedEquipment);
             } catch (EquipmentNotFoundException e) {
                 log.warn("Equipment not found for update: {}", equipmentId);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
