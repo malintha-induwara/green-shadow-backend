@@ -3,6 +3,7 @@ package lk.ijse.gdse68.greenshadow.controller;
 
 import jakarta.validation.Valid;
 import lk.ijse.gdse68.greenshadow.dto.StaffDTO;
+import lk.ijse.gdse68.greenshadow.exception.DataPersistFailedException;
 import lk.ijse.gdse68.greenshadow.exception.StaffNotFoundException;
 import lk.ijse.gdse68.greenshadow.service.StaffService;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +21,13 @@ import java.util.List;
 @PreAuthorize("hasAnyRole('MANAGER','ADMINISTRATIVE')")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin("*")
 public class StaffController {
 
     private final StaffService staffService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveStaff(@Valid @RequestBody StaffDTO staffDTO) {
+    public ResponseEntity<StaffDTO> saveStaff(@Valid @RequestBody StaffDTO staffDTO) {
         log.info("Received request to save staff: {}", staffDTO);
 
         if (staffDTO == null) {
@@ -33,9 +35,9 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
             try {
-                staffService.saveStaff(staffDTO);
-                log.info("Staff saved successfully: {}", staffDTO.getStaffId());
-                return ResponseEntity.status(HttpStatus.CREATED).build();
+                StaffDTO savedStaff = staffService.saveStaff(staffDTO);
+                log.info("Staff saved successfully: {}", savedStaff.getStaffId());
+                return ResponseEntity.status(HttpStatus.CREATED).body(savedStaff);
             } catch (Exception e) {
                 log.error("Unexpected error while saving staff: {}", staffDTO.getStaffId(), e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -44,16 +46,16 @@ public class StaffController {
     }
 
     @PutMapping(path = "/{staffId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateStaff(@PathVariable("staffId") String staffId,@Valid @RequestBody StaffDTO staffDTO) {
+    public ResponseEntity<StaffDTO> updateStaff(@PathVariable("staffId") String staffId,@Valid @RequestBody StaffDTO staffDTO) {
         log.info("Received request to update staff: {}", staffId);
         if (staffId == null) {
             log.warn("Received null staffId for update");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
             try {
-                staffService.updateStaff(staffId, staffDTO);
+                StaffDTO updatedStaff = staffService.updateStaff(staffId, staffDTO);
                 log.info("Staff updated successfully: {}", staffId);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                return ResponseEntity.status(HttpStatus.OK).body(updatedStaff);
             } catch (StaffNotFoundException e) {
                 log.warn("Staff not found for update: {}", staffId);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -112,6 +114,9 @@ public class StaffController {
             } catch (StaffNotFoundException e) {
                 log.warn("Staff not found for deletion: {}", staffId);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }catch (DataPersistFailedException e) {
+                log.warn("Failed to delete staff: {}", staffId);
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             } catch (Exception e) {
                 log.error("Unexpected error while deleting staff: {}", staffId, e);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
