@@ -2,10 +2,12 @@ package lk.ijse.gdse68.greenshadow.service.impl;
 
 import lk.ijse.gdse68.greenshadow.dto.FieldDTO;
 import lk.ijse.gdse68.greenshadow.entity.Field;
+import lk.ijse.gdse68.greenshadow.entity.Staff;
 import lk.ijse.gdse68.greenshadow.enums.ImageType;
 import lk.ijse.gdse68.greenshadow.exception.DataPersistFailedException;
 import lk.ijse.gdse68.greenshadow.exception.FieldNotFoundException;
 import lk.ijse.gdse68.greenshadow.repository.FieldRepository;
+import lk.ijse.gdse68.greenshadow.repository.StaffRepository;
 import lk.ijse.gdse68.greenshadow.service.FieldService;
 import lk.ijse.gdse68.greenshadow.util.ImageUtil;
 import lk.ijse.gdse68.greenshadow.util.Mapper;
@@ -25,44 +27,78 @@ public class FieldServiceImpl implements FieldService {
 
     private final FieldRepository fieldRepository;
 
+    private final StaffRepository staffRepository;
+
     private final ImageUtil imageUtil;
 
 
     @Override
-    @Transactional
-    public void saveField(FieldDTO<MultipartFile> fieldDTO) {
+    public FieldDTO<String> saveField(FieldDTO<MultipartFile> fieldDTO) {
         try {
             String image1Name = imageUtil.saveImage(ImageType.FIELD, fieldDTO.getFieldImage1());
             String image2Name = imageUtil.saveImage(ImageType.FIELD, fieldDTO.getFieldImage2());
 
             Field field = mapper.convertToFieldEntity(fieldDTO);
 
+            if (fieldDTO.getStaff() != null) {
+                List<Staff> staffFromIds = getStaffFromIds(fieldDTO.getStaff());
+                field.setStaff(staffFromIds);
+            }
+
             field.setFieldImage1(image1Name);
             field.setFieldImage2(image2Name);
-            fieldRepository.save(field);
+
+            Field savedField = fieldRepository.save(field);
+            FieldDTO<String> savedFieldDTO = mapper.convertToFieldDTO(savedField);
+            savedFieldDTO.setFieldImage1(imageUtil.getImage(savedField.getFieldImage1()));
+            savedFieldDTO.setFieldImage2(imageUtil.getImage(savedField.getFieldImage2()));
+
+            return savedFieldDTO;
         } catch (Exception e) {
             throw new DataPersistFailedException("Failed to save the field");
         }
     }
 
+    private List<Staff> getStaffFromIds(List<String> staff) {
+        return staffRepository.findAllById(staff);
+    }
+
     @Override
     @Transactional
-    public void updateField(String fieldId, FieldDTO<MultipartFile> fieldDTO) {
+    public FieldDTO<String> updateField(String fieldId, FieldDTO<MultipartFile> fieldDTO) {
         Optional<Field> tempField = fieldRepository.findById(fieldId);
         if (tempField.isPresent()) {
 
-            tempField.get().setFieldName(fieldDTO.getFieldName());
-            tempField.get().setExtentSize(fieldDTO.getExtentSize());
+            String image1Name = tempField.get().getFieldImage1();
+            String image2Name = tempField.get().getFieldImage2();
 
             if (!fieldDTO.getFieldImage1().isEmpty()) {
-                String image1Name = imageUtil.updateImage(tempField.get().getFieldImage1(), ImageType.FIELD, fieldDTO.getFieldImage1());
-                tempField.get().setFieldImage1(image1Name);
+                image1Name = imageUtil.updateImage(tempField.get().getFieldImage1(), ImageType.FIELD, fieldDTO.getFieldImage1());
             }
 
             if (!fieldDTO.getFieldImage2().isEmpty()) {
-                String image2Name = imageUtil.updateImage(tempField.get().getFieldImage2(), ImageType.FIELD, fieldDTO.getFieldImage2());
-                tempField.get().setFieldImage2(image2Name);
+                image2Name = imageUtil.updateImage(tempField.get().getFieldImage2(), ImageType.FIELD, fieldDTO.getFieldImage2());
             }
+
+
+            if (fieldDTO.getStaff() != null) {
+                List<Staff> staffFromIds = getStaffFromIds(fieldDTO.getStaff());
+                tempField.get().setStaff(staffFromIds);
+            }else {
+                tempField.get().setStaff(null);
+            }
+
+            tempField.get().setFieldName(fieldDTO.getFieldName());
+            tempField.get().setExtentSize(fieldDTO.getExtentSize());
+            tempField.get().setFieldImage1(image1Name);
+            tempField.get().setFieldImage2(image2Name);
+
+            FieldDTO<String> updatedFieldDTO = mapper.convertToFieldDTO(tempField.get());
+            updatedFieldDTO.setFieldImage1(imageUtil.getImage(tempField.get().getFieldImage1()));
+            updatedFieldDTO.setFieldImage2(imageUtil.getImage(tempField.get().getFieldImage2()));
+            return updatedFieldDTO;
+        } else {
+            throw new FieldNotFoundException("Field not found");
         }
     }
 

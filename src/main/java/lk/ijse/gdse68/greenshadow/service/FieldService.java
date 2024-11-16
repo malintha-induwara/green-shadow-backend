@@ -6,9 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface FieldService {
-    void saveField(FieldDTO<MultipartFile> fieldDTO);
+    FieldDTO<String> saveField(FieldDTO<MultipartFile> fieldDTO);
 
-    void updateField(String fieldId, FieldDTO<MultipartFile> fieldDTO);
+    FieldDTO<String> updateField(String fieldId, FieldDTO<MultipartFile> fieldDTO);
 
     void deleteField(String fieldId);
 

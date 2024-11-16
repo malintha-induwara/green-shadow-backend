@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -23,22 +24,29 @@ import java.util.List;
 @PreAuthorize("hasAnyRole('MANAGER','SCIENTIST')")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin("*")
 public class FieldController {
 
 
     private final FieldService fieldService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> saveField(@RequestPart("fieldName") String fieldName,
-                                          @RequestPart("latitude") String latitude,
-                                          @RequestPart("longitude") String longitude,
-                                          @RequestPart("extentSize") String extentSize,
-                                          @RequestPart("fieldImage1") MultipartFile fieldImage1,
-                                          @RequestPart("fieldImage2") MultipartFile fieldImage2) {
+    public ResponseEntity<FieldDTO<String>> saveField(@RequestPart("fieldName") String fieldName,
+                                                      @RequestPart("latitude") String latitude,
+                                                      @RequestPart("longitude") String longitude,
+                                                      @RequestPart("extentSize") String extentSize,
+                                                      @RequestPart(value = "staffIds", required = false) String staffIds,
+                                                      @RequestPart("fieldImage1") MultipartFile fieldImage1,
+                                                      @RequestPart("fieldImage2") MultipartFile fieldImage2) {
         log.info("Received request to save field: {}", fieldName);
         try {
             FieldDTO<MultipartFile> fieldDTO = new FieldDTO<>();
             Point fieldLocation = new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
+
+            if (staffIds != null) {
+                List<String> staffCodeList = Arrays.asList(staffIds.split(","));
+                fieldDTO.setStaff(staffCodeList);
+            }
 
             fieldDTO.setFieldName(fieldName);
             fieldDTO.setFieldLocation(fieldLocation);
@@ -46,9 +54,9 @@ public class FieldController {
             fieldDTO.setFieldImage1(fieldImage1);
             fieldDTO.setFieldImage2(fieldImage2);
 
-            fieldService.saveField(fieldDTO);
+            FieldDTO<String> savedField = fieldService.saveField(fieldDTO);
             log.info("Field saved successfully: {}", fieldName);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedField);
         } catch (DataPersistFailedException e) {
             log.error("Failed to save field: {}", fieldName, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -62,13 +70,14 @@ public class FieldController {
     }
 
     @PutMapping(path = "/{fieldCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateField(@PathVariable("fieldCode") String fieldCode,
-                                            @RequestPart("fieldName") String fieldName,
-                                            @RequestPart("latitude") String latitude,
-                                            @RequestPart("longitude") String longitude,
-                                            @RequestPart("extentSize") String extentSize,
-                                            @RequestPart("fieldImage1") MultipartFile fieldImage1,
-                                            @RequestPart("fieldImage2") MultipartFile fieldImage2) {
+    public ResponseEntity<FieldDTO<String>> updateField(@PathVariable("fieldCode") String fieldCode,
+                                                        @RequestPart("fieldName") String fieldName,
+                                                        @RequestPart("latitude") String latitude,
+                                                        @RequestPart("longitude") String longitude,
+                                                        @RequestPart("extentSize") String extentSize,
+                                                        @RequestPart(value = "staffIds", required = false) String staffIds,
+                                                        @RequestPart("fieldImage1") MultipartFile fieldImage1,
+                                                        @RequestPart("fieldImage2") MultipartFile fieldImage2) {
         log.info("Received request to update field: {}", fieldCode);
 
         if (fieldCode == null) {
@@ -76,18 +85,23 @@ public class FieldController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
             try {
-                Point fieldLocation = new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
                 FieldDTO<MultipartFile> fieldDTO = new FieldDTO<>();
-                fieldDTO.setFieldCode(fieldCode);
+                Point fieldLocation = new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
+
+                if (staffIds != null) {
+                    List<String> staffCodeList = Arrays.asList(staffIds.split(","));
+                    fieldDTO.setStaff(staffCodeList);
+                }
+
                 fieldDTO.setFieldName(fieldName);
                 fieldDTO.setFieldLocation(fieldLocation);
                 fieldDTO.setExtentSize(Double.parseDouble(extentSize));
                 fieldDTO.setFieldImage1(fieldImage1);
                 fieldDTO.setFieldImage2(fieldImage2);
 
-                fieldService.updateField(fieldCode, fieldDTO);
+                FieldDTO<String> updatedField = fieldService.updateField(fieldCode, fieldDTO);
                 log.info("Field updated successfully: {}", fieldCode);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                return ResponseEntity.status(HttpStatus.OK).body(updatedField);
             } catch (FieldNotFoundException e) {
                 log.warn("Field not found for update: {}", fieldCode);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -155,7 +169,5 @@ public class FieldController {
             }
         }
     }
-
-
 }
 
