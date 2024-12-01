@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,10 +25,10 @@ public class StaffServiceImpl implements StaffService {
 
     @Override
     public StaffDTO saveStaff(StaffDTO staffDTO) {
+        Staff tempStaff = mapper.convertToStaffEntity(staffDTO);
         try {
-            Staff tempStaff = mapper.convertToStaffEntity(staffDTO);
-            staffRepository.save(tempStaff);
-            return mapper.convertToStaffDTO(tempStaff);
+            Staff savedStaff = staffRepository.save(tempStaff);
+            return mapper.convertToStaffDTO(savedStaff);
         } catch (Exception e) {
             throw new DataPersistFailedException("Failed to save the staff");
         }
