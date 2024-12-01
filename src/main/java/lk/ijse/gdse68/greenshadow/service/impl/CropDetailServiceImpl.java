@@ -37,21 +37,32 @@ public class CropDetailServiceImpl implements CropDetailService {
 
     @Override
     @Transactional
-    public void saveCropDetail(CropDetailDTO<MultipartFile> cropDetailDTO) {
+    public CropDetailDTO<String> saveCropDetail(CropDetailDTO<MultipartFile> cropDetailDTO) {
         String imageName = imageUtil.saveImage(ImageType.CROP_DETAIL, cropDetailDTO.getObservedImage());
         CropDetail cropDetail = mapper.convertToCropDetailEntity(cropDetailDTO);
         cropDetail.setObservedImage(imageName);
 
-        List<Field> fields = getFieldsFromCodes(cropDetailDTO.getFieldCodes());
-        List<Crop> crops = getCropsFromCodes(cropDetailDTO.getCropCodes());
-        List<Staff> staff = getStaffFromIds(cropDetailDTO.getStaffIds());
+        if (cropDetailDTO.getFieldCodes()!=null) {
+            List<Field> fields = getFieldsFromCodes(cropDetailDTO.getFieldCodes());
+            cropDetail.setFields(fields);
+        }
 
-        cropDetail.setFields(fields);
-        cropDetail.setCrops(crops);
-        cropDetail.setStaff(staff);
+        if (cropDetailDTO.getCropCodes()!=null) {
+            List<Crop> crops = getCropsFromCodes(cropDetailDTO.getCropCodes());
+            cropDetail.setCrops(crops);
+        }
+
+        if (cropDetailDTO.getStaffIds()!=null) {
+            List<Staff> staff = getStaffFromIds(cropDetailDTO.getStaffIds());
+            cropDetail.setStaff(staff);
+        }
+
 
         try {
-            cropDetailRepository.save(cropDetail);
+            CropDetail savedCropLog = cropDetailRepository.save(cropDetail);
+            CropDetailDTO<String> savedCropLogDTO = mapper.convertToCropDetailDTO(savedCropLog);
+            savedCropLogDTO.setObservedImage(imageUtil.getImage(savedCropLog.getObservedImage()));
+            return savedCropLogDTO;
         } catch (Exception e) {
             throw new DataPersistFailedException("Failed to save the crop detail");
         }
@@ -60,23 +71,44 @@ public class CropDetailServiceImpl implements CropDetailService {
 
     @Override
     @Transactional
-    public void updateCropDetail(String logCode, CropDetailDTO<MultipartFile> cropDetailDTO) {
+    public CropDetailDTO<String> updateCropDetail(String logCode, CropDetailDTO<MultipartFile> cropDetailDTO) {
         Optional<CropDetail> tempCropDetail = cropDetailRepository.findById(logCode);
         if (tempCropDetail.isPresent()) {
             String imageName = tempCropDetail.get().getObservedImage();
+
             if (!cropDetailDTO.getObservedImage().isEmpty()) {
                 imageName = imageUtil.updateImage(tempCropDetail.get().getObservedImage(), ImageType.CROP_DETAIL, cropDetailDTO.getObservedImage());
             }
 
-            List<Field> fields = getFieldsFromCodes(cropDetailDTO.getFieldCodes());
-            List<Crop> crops = getCropsFromCodes(cropDetailDTO.getCropCodes());
-            List<Staff> staff = getStaffFromIds(cropDetailDTO.getStaffIds());
 
+            if (cropDetailDTO.getStaffIds() != null) {
+                List<Staff> staff = getStaffFromIds(cropDetailDTO.getStaffIds());
+                tempCropDetail.get().setStaff(staff);
+            }else {
+                tempCropDetail.get().setStaff(null);
+            }
+
+            if (cropDetailDTO.getFieldCodes() != null) {
+                List<Field> fields = getFieldsFromCodes(cropDetailDTO.getFieldCodes());
+                tempCropDetail.get().setFields(fields);
+            }else {
+                tempCropDetail.get().setFields(null);
+            }
+
+            if (cropDetailDTO.getCropCodes() != null) {
+                List<Crop> crops = getCropsFromCodes(cropDetailDTO.getCropCodes());
+                tempCropDetail.get().setCrops(crops);
+            }else {
+                tempCropDetail.get().setCrops(null);
+            }
+
+            tempCropDetail.get().setLogDate(cropDetailDTO.getLogDate());
             tempCropDetail.get().setLogDetail(cropDetailDTO.getLogDetail());
             tempCropDetail.get().setObservedImage(imageName);
-            tempCropDetail.get().setFields(fields);
-            tempCropDetail.get().setCrops(crops);
-            tempCropDetail.get().setStaff(staff);
+
+            CropDetailDTO<String> updatedCropLogDTO = mapper.convertToCropDetailDTO(tempCropDetail.get());
+            updatedCropLogDTO.setObservedImage(imageUtil.getImage(tempCropDetail.get().getObservedImage()));
+            return updatedCropLogDTO;
         } else {
             throw new CropDetailNotFoundException("Crop detail not found");
         }

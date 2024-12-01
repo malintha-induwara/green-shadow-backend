@@ -21,12 +21,9 @@ public class CropDetail {
     @Id
     @CustomGenerator(prefix ="CROP-DETAIL-" )
     private String logCode;
-
-    @CreationTimestamp
     private LocalDate logDate;
     private String logDetail;
     private String observedImage;
-
 
     @ManyToMany
     @JoinTable(
