@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -23,25 +24,32 @@ public class Mapper {
 
         //Converters
         Converter<List<Field>, List<String>> fieldToIdConverter = ctx ->
-                ctx.getSource().stream()
-                        .map(Field::getFieldCode)
-                        .collect(Collectors.toList());
+                ctx.getSource() == null ? new ArrayList<>() :
+                        ctx.getSource().stream()
+                                .filter(Objects::nonNull)
+                                .map(Field::getFieldCode)
+                                .collect(Collectors.toList());
 
         Converter<List<Crop>, List<String>> cropToIdConverter = ctx ->
-                ctx.getSource().stream()
-                        .map(Crop::getCropCode)
-                        .collect(Collectors.toList());
+                ctx.getSource() == null ? new ArrayList<>() :
+                        ctx.getSource().stream()
+                                .filter(Objects::nonNull)
+                                .map(Crop::getCropCode)
+                                .collect(Collectors.toList());
 
         Converter<List<Staff>, List<String>> staffToIdConverter = ctx ->
-                ctx.getSource().stream()
-                        .map(Staff::getStaffId)
-                        .collect(Collectors.toList());
+                ctx.getSource() == null ? new ArrayList<>() :
+                        ctx.getSource().stream()
+                                .filter(Objects::nonNull)
+                                .map(Staff::getStaffId)
+                                .collect(Collectors.toList());
 
         Converter<List<Vehicle>, List<String>> vehicleToIdConverter = ctx ->
-                ctx.getSource().stream()
-                        .map(Vehicle::getVehicleCode)
-                        .collect(Collectors.toList());
-
+                ctx.getSource() == null ? new ArrayList<>() :
+                        ctx.getSource().stream()
+                                .filter(Objects::nonNull)
+                                .map(Vehicle::getVehicleCode)
+                                .collect(Collectors.toList());
 
         PropertyMap<Crop, CropDTO<String>> cropMap = new PropertyMap<>() {
             @Override
@@ -107,6 +115,7 @@ public class Mapper {
                     mapper.map(Staff::getAddressLine01, StaffDTO::setAddressLine01);
                     mapper.map(Staff::getAddressLine02, StaffDTO::setAddressLine02);
                     mapper.map(Staff::getAddressLine03, StaffDTO::setAddressLine03);
+                    mapper.map(Staff::getAddressLine04, StaffDTO::setAddressLine04);
                     mapper.map(Staff::getAddressLine05, StaffDTO::setAddressLine05);
                     mapper.map(Staff::getContactNo, StaffDTO::setContactNo);
                     mapper.map(Staff::getRole, StaffDTO::setRole);
