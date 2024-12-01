@@ -27,59 +27,45 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> saveUser(@Valid @RequestBody UserDTO userDTO) {
         log.info("Received request to save user: {}", userDTO);
-
-        if (userDTO == null) {
-            log.warn("Received null UserDTO");
+        try {
+            UserDTO savedUser = userService.saveUser(userDTO);
+            log.info("User saved successfully: {}", savedUser.getEmail());
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        } catch (UserAlreadyExistsExcetipion e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (DataPersistFailedException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                UserDTO savedUser = userService.saveUser(userDTO);
-                log.info("User saved successfully: {}", savedUser.getEmail());
-                return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
-            } catch (UserAlreadyExistsExcetipion e) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            } catch (DataPersistFailedException e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            } catch (Exception e) {
-                log.error("Unexpected error while saving user: {}", userDTO.getEmail(), e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+        } catch (Exception e) {
+            log.error("Unexpected error while saving user: {}", userDTO.getEmail(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
 
-    @PutMapping(path = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> updateUser(@PathVariable("userId") String userId, @Valid @RequestBody UserDTO userDTO) {
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                UserDTO updatedUser = userService.updateUser(userId, userDTO);
-                return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
-            } catch (UserNotFoundException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+        try {
+            UserDTO updatedUser = userService.updateUser(userId, userDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> getUser(@PathVariable("userId") String userId) {
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                UserDTO userDTO = userService.searchUser(userId);
-                return ResponseEntity.ok(userDTO);
-            } catch (UserNotFoundException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+        try {
+            UserDTO userDTO = userService.searchUser(userId);
+            return ResponseEntity.ok(userDTO);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -95,17 +81,13 @@ public class UserController {
 
     @DeleteMapping(path = "/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable("userId") String userId) {
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                userService.deleteUser(userId);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-            } catch (UserNotFoundException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+        try {
+            userService.deleteUser(userId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

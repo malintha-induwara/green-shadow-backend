@@ -80,35 +80,30 @@ public class FieldController {
                                                         @RequestPart("fieldImage2") MultipartFile fieldImage2) {
         log.info("Received request to update field: {}", fieldCode);
 
-        if (fieldCode == null) {
-            log.warn("Received null fieldCode for update");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                FieldDTO<MultipartFile> fieldDTO = new FieldDTO<>();
-                Point fieldLocation = new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
+        try {
+            FieldDTO<MultipartFile> fieldDTO = new FieldDTO<>();
+            Point fieldLocation = new Point(Double.parseDouble(latitude), Double.parseDouble(longitude));
 
-                if (staffIds != null) {
-                    List<String> staffCodeList = Arrays.asList(staffIds.split(","));
-                    fieldDTO.setStaff(staffCodeList);
-                }
-
-                fieldDTO.setFieldName(fieldName);
-                fieldDTO.setFieldLocation(fieldLocation);
-                fieldDTO.setExtentSize(Double.parseDouble(extentSize));
-                fieldDTO.setFieldImage1(fieldImage1);
-                fieldDTO.setFieldImage2(fieldImage2);
-
-                FieldDTO<String> updatedField = fieldService.updateField(fieldCode, fieldDTO);
-                log.info("Field updated successfully: {}", fieldCode);
-                return ResponseEntity.status(HttpStatus.OK).body(updatedField);
-            } catch (FieldNotFoundException e) {
-                log.warn("Field not found for update: {}", fieldCode);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            } catch (Exception e) {
-                log.error("Unexpected error while updating field: {}", fieldCode, e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            if (staffIds != null) {
+                List<String> staffCodeList = Arrays.asList(staffIds.split(","));
+                fieldDTO.setStaff(staffCodeList);
             }
+
+            fieldDTO.setFieldName(fieldName);
+            fieldDTO.setFieldLocation(fieldLocation);
+            fieldDTO.setExtentSize(Double.parseDouble(extentSize));
+            fieldDTO.setFieldImage1(fieldImage1);
+            fieldDTO.setFieldImage2(fieldImage2);
+
+            FieldDTO<String> updatedField = fieldService.updateField(fieldCode, fieldDTO);
+            log.info("Field updated successfully: {}", fieldCode);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedField);
+        } catch (FieldNotFoundException e) {
+            log.warn("Field not found for update: {}", fieldCode);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error("Unexpected error while updating field: {}", fieldCode, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

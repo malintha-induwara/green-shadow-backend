@@ -26,27 +26,21 @@ public class StaffController {
 
     private final StaffService staffService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StaffDTO> saveStaff(@Valid @RequestBody StaffDTO staffDTO) {
         log.info("Received request to save staff: {}", staffDTO);
-
-        if (staffDTO == null) {
-            log.warn("Received null StaffDTO");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                StaffDTO savedStaff = staffService.saveStaff(staffDTO);
-                log.info("Staff saved successfully: {}", savedStaff.getStaffId());
-                return ResponseEntity.status(HttpStatus.CREATED).body(savedStaff);
-            } catch (Exception e) {
-                log.error("Unexpected error while saving staff: {}", staffDTO.getStaffId(), e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+        try {
+            StaffDTO savedStaff = staffService.saveStaff(staffDTO);
+            log.info("Staff saved successfully: {}", savedStaff.getStaffId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedStaff);
+        } catch (Exception e) {
+            log.error("Unexpected error while saving staff: {}", staffDTO.getStaffId(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @PutMapping(path = "/{staffId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<StaffDTO> updateStaff(@PathVariable("staffId") String staffId,@Valid @RequestBody StaffDTO staffDTO) {
+    @PutMapping(path = "/{staffId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StaffDTO> updateStaff(@PathVariable("staffId") String staffId, @Valid @RequestBody StaffDTO staffDTO) {
         log.info("Received request to update staff: {}", staffId);
         if (staffId == null) {
             log.warn("Received null staffId for update");
@@ -69,21 +63,16 @@ public class StaffController {
     @GetMapping(value = "/{staffId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StaffDTO> searchStaff(@PathVariable("staffId") String staffId) {
         log.info("Received request to search staff: {}", staffId);
-        if (staffId == null) {
-            log.warn("Received null staffId for search");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                StaffDTO staffDTO = staffService.searchStaff(staffId);
-                log.info("Staff found: {}", staffId);
-                return ResponseEntity.ok(staffDTO);
-            } catch (StaffNotFoundException e) {
-                log.warn("Staff not found: {}", staffId);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            } catch (Exception e) {
-                log.error("Unexpected error while searching for staff: {}", staffId, e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+        try {
+            StaffDTO staffDTO = staffService.searchStaff(staffId);
+            log.info("Staff found: {}", staffId);
+            return ResponseEntity.ok(staffDTO);
+        } catch (StaffNotFoundException e) {
+            log.warn("Staff not found: {}", staffId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error("Unexpected error while searching for staff: {}", staffId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -103,24 +92,19 @@ public class StaffController {
     @DeleteMapping(path = "/{staffId}")
     public ResponseEntity<Void> deleteStaff(@PathVariable("staffId") String staffId) {
         log.info("Received request to delete staff: {}", staffId);
-        if (staffId == null) {
-            log.warn("Received null staffId for deletion");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                staffService.deleteStaff(staffId);
-                log.info("Staff deleted successfully: {}", staffId);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-            } catch (StaffNotFoundException e) {
-                log.warn("Staff not found for deletion: {}", staffId);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }catch (DataPersistFailedException e) {
-                log.warn("Failed to delete staff: {}", staffId);
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            } catch (Exception e) {
-                log.error("Unexpected error while deleting staff: {}", staffId, e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+        try {
+            staffService.deleteStaff(staffId);
+            log.info("Staff deleted successfully: {}", staffId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (StaffNotFoundException e) {
+            log.warn("Staff not found for deletion: {}", staffId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (DataPersistFailedException e) {
+            log.warn("Failed to delete staff: {}", staffId);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (Exception e) {
+            log.error("Unexpected error while deleting staff: {}", staffId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

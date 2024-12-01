@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,68 +24,85 @@ import java.util.List;
 @PreAuthorize("hasAnyRole('MANAGER','SCIENTIST')")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin("*")
 public class CropDetailController {
 
     private final CropDetailService cropDetailService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> saveCropDetail(
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CropDetailDTO<String>> saveCropDetail(
+            @RequestPart("logDate") String logDate,
             @RequestPart("logDetail") String logDetail,
             @RequestPart("observedImage") MultipartFile observedImage,
-            @RequestPart("fieldCodes") String fieldCodes,
-            @RequestPart("cropCodes") String cropCodes,
-            @RequestPart("staffIds") String staffIds) {
-
+            @RequestPart(value = "fieldCodes", required = false) String fieldCodes,
+            @RequestPart(value = "cropCodes", required = false) String cropCodes,
+            @RequestPart(value = "staffIds", required = false) String staffIds) {
         log.info("Received request to save crop detail");
-
         try {
-            List<String> fieldCodesList = Arrays.asList(fieldCodes.split(","));
-            List<String> cropCodesList = Arrays.asList(cropCodes.split(","));
-            List<String> staffIdsList = Arrays.asList(staffIds.split(","));
-
             CropDetailDTO<MultipartFile> cropDetailDTO = new CropDetailDTO<>();
+            if (staffIds != null) {
+                List<String> staffIdsList = Arrays.asList(staffIds.split(","));
+                cropDetailDTO.setStaffIds(staffIdsList);
+            }
+
+            if (fieldCodes != null) {
+                List<String> fieldCodesList = Arrays.asList(fieldCodes.split(","));
+                cropDetailDTO.setFieldCodes(fieldCodesList);
+            }
+
+            if (cropCodes != null) {
+                List<String> cropCodesList = Arrays.asList(cropCodes.split(","));
+                cropDetailDTO.setCropCodes(cropCodesList);
+            }
+
+            cropDetailDTO.setLogDate(LocalDate.parse(logDate));
             cropDetailDTO.setLogDetail(logDetail);
             cropDetailDTO.setObservedImage(observedImage);
-            cropDetailDTO.setFieldCodes(fieldCodesList);
-            cropDetailDTO.setCropCodes(cropCodesList);
-            cropDetailDTO.setStaffIds(staffIdsList);
 
-            cropDetailService.saveCropDetail(cropDetailDTO);
+            CropDetailDTO<String> savedCropDetailLog = cropDetailService.saveCropDetail(cropDetailDTO);
             log.info("Crop detail saved successfully");
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedCropDetailLog);
         } catch (Exception e) {
             log.error("Failed to save crop detail", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @PutMapping(path = "/{logCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateCropDetail(
+    @PutMapping(path = "/{logCode}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CropDetailDTO<String>> updateCropDetail(
             @PathVariable("logCode") String logCode,
+            @RequestPart("logDate") String logDate,
             @RequestPart("logDetail") String logDetail,
-            @RequestPart(value = "observedImage", required = false) MultipartFile observedImage,
-            @RequestPart("fieldCodes") String fieldCodes,
-            @RequestPart("cropCodes") String cropCodes,
-            @RequestPart("staffIds") String staffIds) {
-
+            @RequestPart("observedImage") MultipartFile observedImage,
+            @RequestPart(value = "fieldCodes", required = false) String fieldCodes,
+            @RequestPart(value = "cropCodes", required = false) String cropCodes,
+            @RequestPart(value = "staffIds", required = false) String staffIds) {
         log.info("Received request to update crop detail: {}", logCode);
-
         try {
-            List<String> fieldCodesList = Arrays.asList(fieldCodes.split(","));
-            List<String> cropCodesList = Arrays.asList(cropCodes.split(","));
-            List<String> staffIdsList = Arrays.asList(staffIds.split(","));
-
             CropDetailDTO<MultipartFile> cropDetailDTO = new CropDetailDTO<>();
+            if (staffIds != null) {
+                List<String> staffIdsList = Arrays.asList(staffIds.split(","));
+                cropDetailDTO.setStaffIds(staffIdsList);
+            }
+
+            if (fieldCodes != null) {
+                List<String> fieldCodesList = Arrays.asList(fieldCodes.split(","));
+                cropDetailDTO.setFieldCodes(fieldCodesList);
+            }
+
+            if (cropCodes != null) {
+                List<String> cropCodesList = Arrays.asList(cropCodes.split(","));
+                cropDetailDTO.setCropCodes(cropCodesList);
+            }
+
+            cropDetailDTO.setLogDate(LocalDate.parse(logDate));
             cropDetailDTO.setLogCode(logCode);
             cropDetailDTO.setLogDetail(logDetail);
             cropDetailDTO.setObservedImage(observedImage);
-            cropDetailDTO.setFieldCodes(fieldCodesList);
-            cropDetailDTO.setCropCodes(cropCodesList);
-            cropDetailDTO.setStaffIds(staffIdsList);
 
-            cropDetailService.updateCropDetail(logCode, cropDetailDTO);
+            CropDetailDTO<String> updatedCropDetailLog = cropDetailService.updateCropDetail(logCode, cropDetailDTO);
             log.info("Crop detail updated successfully: {}", logCode);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return ResponseEntity.status(HttpStatus.OK).body(updatedCropDetailLog);
         } catch (CropDetailNotFoundException e) {
             log.warn("Crop detail not found: {}", logCode);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -100,7 +118,6 @@ public class CropDetailController {
     @GetMapping(value = "/{logCode}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CropDetailDTO<String>> getCropDetail(@PathVariable("logCode") String logCode) {
         log.info("Received request to get crop detail: {}", logCode);
-
         try {
             CropDetailDTO<String> cropDetailDTO = cropDetailService.getCropDetail(logCode);
             return ResponseEntity.ok(cropDetailDTO);
@@ -116,7 +133,6 @@ public class CropDetailController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CropDetailDTO<String>>> getAllCropDetails() {
         log.info("Received request to get all crop details");
-
         try {
             List<CropDetailDTO<String>> cropDetails = cropDetailService.getAllCropDetails();
             return ResponseEntity.ok(cropDetails);
@@ -129,7 +145,6 @@ public class CropDetailController {
     @DeleteMapping("/{logCode}")
     public ResponseEntity<Void> deleteCropDetail(@PathVariable("logCode") String logCode) {
         log.info("Received request to delete crop detail: {}", logCode);
-
         try {
             cropDetailService.deleteCropDetail(logCode);
             log.info("Crop detail deleted successfully: {}", logCode);

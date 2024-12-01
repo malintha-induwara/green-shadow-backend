@@ -25,67 +25,52 @@ public class VehicleController {
 
     private final VehicleService vehicleService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<VehicleDTO> saveVehicle(@Valid @RequestBody VehicleDTO vehicleDTO) {
         log.info("Received request to save vehicle: {}", vehicleDTO);
-
-        if (vehicleDTO == null) {
-            log.warn("Received null VehicleDTO");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                VehicleDTO savedVehicle = vehicleService.saveVehicle(vehicleDTO);
-                log.info("Vehicle saved successfully: {}", savedVehicle.getVehicleCode());
-                return ResponseEntity.status(HttpStatus.CREATED).body(savedVehicle);
-            } catch (Exception e) {
-                log.error("Unexpected error while saving vehicle: {}", vehicleDTO.getVehicleCode(), e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+        try {
+            VehicleDTO savedVehicle = vehicleService.saveVehicle(vehicleDTO);
+            log.info("Vehicle saved successfully: {}", savedVehicle.getVehicleCode());
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedVehicle);
+        } catch (Exception e) {
+            log.error("Unexpected error while saving vehicle: {}", vehicleDTO.getVehicleCode(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @PutMapping(path = "/{vehicleId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<VehicleDTO> updateVehicle(@PathVariable("vehicleId") String vehicleId,@Valid @RequestBody VehicleDTO vehicleDTO) {
+    @PutMapping(path = "/{vehicleId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<VehicleDTO> updateVehicle(@PathVariable("vehicleId") String vehicleId, @Valid @RequestBody VehicleDTO vehicleDTO) {
         log.info("Received request to update vehicle: {}", vehicleId);
-        if (vehicleId == null) {
-            log.warn("Received null vehicleId for update");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                VehicleDTO updatedVehicle = vehicleService.updateVehicle(vehicleId, vehicleDTO);
-                log.info("Vehicle updated successfully: {}", vehicleId);
-                return ResponseEntity.status(HttpStatus.OK).body(updatedVehicle);
-            } catch (VehicleNotFoundException e) {
-                log.warn("Vehicle not found for update: {}", vehicleId);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }catch (StaffNotFoundException e){
-                log.warn("Staff not found for update: {}", vehicleId);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            } catch (Exception e) {
-                log.error("Unexpected error while updating vehicle: {}", vehicleId, e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+        try {
+            VehicleDTO updatedVehicle = vehicleService.updateVehicle(vehicleId, vehicleDTO);
+            log.info("Vehicle updated successfully: {}", vehicleId);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedVehicle);
+        } catch (VehicleNotFoundException e) {
+            log.warn("Vehicle not found for update: {}", vehicleId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (StaffNotFoundException e) {
+            log.warn("Staff not found for update: {}", vehicleId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error("Unexpected error while updating vehicle: {}", vehicleId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+
     }
 
     @GetMapping(value = "/{vehicleId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<VehicleDTO> searchVehicle(@PathVariable("vehicleId") String vehicleId) {
         log.info("Received request to search vehicle: {}", vehicleId);
-        if (vehicleId == null) {
-            log.warn("Received null vehicleId for search");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                VehicleDTO vehicleDTO = vehicleService.searchVehicle(vehicleId);
-                log.info("Vehicle found: {}", vehicleId);
-                return ResponseEntity.ok(vehicleDTO);
-            } catch (VehicleNotFoundException e) {
-                log.warn("Vehicle not found: {}", vehicleId);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            } catch (Exception e) {
-                log.error("Unexpected error while searching for vehicle: {}", vehicleId, e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+        try {
+            VehicleDTO vehicleDTO = vehicleService.searchVehicle(vehicleId);
+            log.info("Vehicle found: {}", vehicleId);
+            return ResponseEntity.ok(vehicleDTO);
+        } catch (VehicleNotFoundException e) {
+            log.warn("Vehicle not found: {}", vehicleId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error("Unexpected error while searching for vehicle: {}", vehicleId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -105,21 +90,16 @@ public class VehicleController {
     @DeleteMapping(path = "/{vehicleId}")
     public ResponseEntity<Void> deleteVehicle(@PathVariable("vehicleId") String vehicleId) {
         log.info("Received request to delete vehicle: {}", vehicleId);
-        if (vehicleId == null) {
-            log.warn("Received null vehicleId for deletion");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            try {
-                vehicleService.deleteVehicle(vehicleId);
-                log.info("Vehicle deleted successfully: {}", vehicleId);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-            } catch (VehicleNotFoundException e) {
-                log.warn("Vehicle not found for deletion: {}", vehicleId);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            } catch (Exception e) {
-                log.error("Unexpected error while deleting vehicle: {}", vehicleId, e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
+        try {
+            vehicleService.deleteVehicle(vehicleId);
+            log.info("Vehicle deleted successfully: {}", vehicleId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (VehicleNotFoundException e) {
+            log.warn("Vehicle not found for deletion: {}", vehicleId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error("Unexpected error while deleting vehicle: {}", vehicleId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
