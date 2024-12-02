@@ -2,7 +2,9 @@ package lk.ijse.gdse68.greenshadow.service.impl;
 
 import lk.ijse.gdse68.greenshadow.dto.UserDTO;
 import lk.ijse.gdse68.greenshadow.entity.User;
+import lk.ijse.gdse68.greenshadow.entity.Vehicle;
 import lk.ijse.gdse68.greenshadow.exception.DataPersistFailedException;
+import lk.ijse.gdse68.greenshadow.exception.UserAlreadyExistsExcetipion;
 import lk.ijse.gdse68.greenshadow.jwtmodels.JwtAuthResponse;
 import lk.ijse.gdse68.greenshadow.jwtmodels.SignIn;
 import lk.ijse.gdse68.greenshadow.repository.UserRepository;
@@ -15,6 +17,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,8 +41,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtAuthResponse signUp(UserDTO signUp) {
+        Optional<User> tempUser = userRepository.findById(signUp.getEmail());
+        if (tempUser.isPresent()) {
+            throw new UserAlreadyExistsExcetipion("User already exists");
+        }
         try {
-            //Encrypt the password
             signUp.setPassword(passwordEncoder.encode(signUp.getPassword()));
             User savedUser = userRepository.save(mapper.convertToUserEntity(signUp));
             String generateToken = jwtService.generateToken(savedUser);
@@ -52,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
     public JwtAuthResponse refreshToken(String accessToken) {
         String extractedUserName = jwtService.extractUsername(accessToken);
         User user = userRepository.findById(extractedUserName).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        String refreshToken = jwtService.refreshToken(user);
+        String refreshToken = jwtService.generateToken(user);
         return JwtAuthResponse.builder().token(refreshToken).build();
     }
 }

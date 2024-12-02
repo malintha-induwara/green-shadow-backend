@@ -88,6 +88,7 @@ public class FieldServiceImpl implements FieldService {
                 tempField.get().setStaff(null);
             }
 
+            tempField.get().setFieldLocation(fieldDTO.getFieldLocation());
             tempField.get().setFieldName(fieldDTO.getFieldName());
             tempField.get().setExtentSize(fieldDTO.getExtentSize());
             tempField.get().setFieldImage1(image1Name);
