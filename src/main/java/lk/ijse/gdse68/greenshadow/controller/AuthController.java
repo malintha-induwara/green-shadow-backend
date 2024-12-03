@@ -7,7 +7,7 @@ import lk.ijse.gdse68.greenshadow.dto.UserDTO;
 import lk.ijse.gdse68.greenshadow.exception.DataPersistFailedException;
 import lk.ijse.gdse68.greenshadow.exception.UserAlreadyExistsExcetipion;
 import lk.ijse.gdse68.greenshadow.jwtmodels.JwtAuthResponse;
-import lk.ijse.gdse68.greenshadow.jwtmodels.SignIn;
+import lk.ijse.gdse68.greenshadow.jwtmodels.AuthRequest;
 import lk.ijse.gdse68.greenshadow.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,26 +25,26 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping(value = "signUp", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JwtAuthResponse> signUp(@Valid @RequestBody UserDTO userDTO) {
-        log.info("Received sign-up request for email: {}", userDTO.getEmail());
+    public ResponseEntity<JwtAuthResponse> signUp(@Valid @RequestBody AuthRequest signUp) {
+        log.info("Received sign-up request for email: {}", signUp.getEmail());
         try {
-            JwtAuthResponse response = authService.signUp(userDTO);
-            log.info("User successfully signed up with email: {}", userDTO.getEmail());
+            JwtAuthResponse response = authService.signUp(signUp);
+            log.info("User successfully signed up with email: {}", signUp.getEmail());
             return ResponseEntity.ok(response);
         } catch (UserAlreadyExistsExcetipion e) {
-            log.warn("Sign-up failed: User with email {} already exists", userDTO.getEmail());
+            log.warn("Sign-up failed: User with email {} already exists", signUp.getEmail());
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (DataPersistFailedException e) {
-            log.error("Sign-up failed: Unable to persist user data for email: {}", userDTO.getEmail(), e);
+            log.error("Sign-up failed: Unable to persist user data for email: {}", signUp.getEmail(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
-            log.error("Sign-up failed: Internal server error for email: {}", userDTO.getEmail(), e);
+            log.error("Sign-up failed: Internal server error for email: {}", signUp.getEmail(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @PostMapping(value = "signIn", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JwtAuthResponse> signIn(@Valid @RequestBody SignIn signIn) {
+    public ResponseEntity<JwtAuthResponse> signIn(@Valid @RequestBody AuthRequest signIn) {
         log.info("Received sign-in request for email: {}", signIn.getEmail());
         try {
             JwtAuthResponse response = authService.signIn(signIn);

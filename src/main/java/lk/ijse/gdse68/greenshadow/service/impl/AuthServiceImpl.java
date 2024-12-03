@@ -2,11 +2,11 @@ package lk.ijse.gdse68.greenshadow.service.impl;
 
 import lk.ijse.gdse68.greenshadow.dto.UserDTO;
 import lk.ijse.gdse68.greenshadow.entity.User;
-import lk.ijse.gdse68.greenshadow.entity.Vehicle;
+import lk.ijse.gdse68.greenshadow.enums.Role;
 import lk.ijse.gdse68.greenshadow.exception.DataPersistFailedException;
 import lk.ijse.gdse68.greenshadow.exception.UserAlreadyExistsExcetipion;
 import lk.ijse.gdse68.greenshadow.jwtmodels.JwtAuthResponse;
-import lk.ijse.gdse68.greenshadow.jwtmodels.SignIn;
+import lk.ijse.gdse68.greenshadow.jwtmodels.AuthRequest;
 import lk.ijse.gdse68.greenshadow.repository.UserRepository;
 import lk.ijse.gdse68.greenshadow.service.AuthService;
 import lk.ijse.gdse68.greenshadow.service.JWTService;
@@ -31,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public JwtAuthResponse signIn(SignIn signIn) {
+    public JwtAuthResponse signIn(AuthRequest signIn) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(signIn.getEmail(), signIn.getPassword());
         authenticationManager.authenticate(authenticationToken);
         User userByEmail = userRepository.findById(signIn.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -40,14 +40,15 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public JwtAuthResponse signUp(UserDTO signUp) {
+    public JwtAuthResponse signUp(AuthRequest signUp) {
         Optional<User> tempUser = userRepository.findById(signUp.getEmail());
         if (tempUser.isPresent()) {
             throw new UserAlreadyExistsExcetipion("User already exists");
         }
         try {
             signUp.setPassword(passwordEncoder.encode(signUp.getPassword()));
-            User savedUser = userRepository.save(mapper.convertToUserEntity(signUp));
+            User user = new User(signUp.getEmail(),signUp.getPassword(), Role.OTHER);
+            User savedUser = userRepository.save(user);
             String generateToken = jwtService.generateToken(savedUser);
             return JwtAuthResponse.builder().token(generateToken).build();
         } catch (Exception e) {

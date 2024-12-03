@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class SignIn {
+public class AuthRequest {
     @NotBlank(message = "Email is required")
     private String email;
     @NotBlank(message = "Password is required")
