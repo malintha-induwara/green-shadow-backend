@@ -3,6 +3,8 @@ package lk.ijse.gdse68.greenshadow.controller;
 import jakarta.validation.Valid;
 import lk.ijse.gdse68.greenshadow.dto.EquipmentDTO;
 import lk.ijse.gdse68.greenshadow.exception.EquipmentNotFoundException;
+import lk.ijse.gdse68.greenshadow.exception.FieldNotFoundException;
+import lk.ijse.gdse68.greenshadow.exception.StaffNotFoundException;
 import lk.ijse.gdse68.greenshadow.service.EquipmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,12 @@ public class EquipmentController {
             EquipmentDTO savedEquipment = equipmentService.saveEquipment(equipmentDTO);
             log.info("Equipment saved successfully: {}", equipmentDTO.getEquipmentId());
             return ResponseEntity.status(HttpStatus.CREATED).body(savedEquipment);
+        } catch (FieldNotFoundException e) {
+            log.warn("Field not found for equipment: {}", equipmentDTO.getField());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (StaffNotFoundException e) {
+            log.warn("Staff not found for equipment: {}", equipmentDTO.getStaff());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             log.error("Unexpected error while saving equipment: {}", equipmentDTO.getEquipmentId(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -46,6 +54,12 @@ public class EquipmentController {
             return ResponseEntity.status(HttpStatus.OK).body(updatedEquipment);
         } catch (EquipmentNotFoundException e) {
             log.warn("Equipment not found for update: {}", equipmentId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (FieldNotFoundException e) {
+            log.warn("Field not found for equipment: {}", equipmentDTO.getField());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (StaffNotFoundException e) {
+            log.warn("Staff not found for equipment: {}", equipmentDTO.getStaff());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             log.error("Unexpected error while updating equipment: {}", equipmentId, e);
