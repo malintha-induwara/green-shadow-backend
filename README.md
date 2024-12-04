@@ -86,7 +86,7 @@ The ER diagram for the Green Shadow Farm Management System can be found here:
 
 ### Class Structure
 The class diagram showing the system's architecture and relationships can be found here:
-[View Class Diagram](https://drive.google.com/file/d/1u9ecV1H7YKYDgXaqrsSF-DyOpzETwyA8/view?usp=s)
+[View Class Diagram](https://drive.google.com/file/d/1PRyzeWztUqb9Rz5-lXi7nbFhv_ocrOmA/view?u)
 
 ## API Documentation
 
