@@ -118,6 +118,9 @@ public class CropController {
         } catch (CropNotFoundException e) {
             log.warn("Crop not found for deletion: {}", cropId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }catch (DataPersistFailedException e) {
+            log.warn("Failed to delete crop: {}", cropId);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
             log.error("Unexpected error while deleting crop: {}", cropId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

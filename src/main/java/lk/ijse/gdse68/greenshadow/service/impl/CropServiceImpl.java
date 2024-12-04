@@ -79,7 +79,7 @@ public class CropServiceImpl implements CropService {
             } else {
                 tempCrop.get().setField(null);
             }
-            
+
             tempCrop.get().setCropCommonName(cropDTO.getCropCommonName());
             tempCrop.get().setCropScientificName(cropDTO.getCropScientificName());
             tempCrop.get().setImage(imageName);
@@ -99,11 +99,15 @@ public class CropServiceImpl implements CropService {
     @Transactional
     public void deleteCrop(String cropId) {
         Optional<Crop> tempCrop = cropRepository.findById(cropId);
-        if (tempCrop.isPresent()) {
+        if (tempCrop.isEmpty()) {
+            throw new CropNotFoundException("Crop not found");
+        }
+
+        try {
             imageUtil.deleteImage(tempCrop.get().getImage());
             cropRepository.deleteById(cropId);
-        } else {
-            throw new CropNotFoundException("Crop not found");
+        } catch (Exception e) {
+            throw new DataPersistFailedException("Failed to delete the crop");
         }
     }
 

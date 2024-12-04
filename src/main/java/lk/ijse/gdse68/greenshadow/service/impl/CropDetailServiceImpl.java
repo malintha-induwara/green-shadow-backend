@@ -42,17 +42,17 @@ public class CropDetailServiceImpl implements CropDetailService {
         CropDetail cropDetail = mapper.convertToCropDetailEntity(cropDetailDTO);
         cropDetail.setObservedImage(imageName);
 
-        if (cropDetailDTO.getFieldCodes()!=null) {
+        if (cropDetailDTO.getFieldCodes() != null) {
             List<Field> fields = getFieldsFromCodes(cropDetailDTO.getFieldCodes());
             cropDetail.setFields(fields);
         }
 
-        if (cropDetailDTO.getCropCodes()!=null) {
+        if (cropDetailDTO.getCropCodes() != null) {
             List<Crop> crops = getCropsFromCodes(cropDetailDTO.getCropCodes());
             cropDetail.setCrops(crops);
         }
 
-        if (cropDetailDTO.getStaffIds()!=null) {
+        if (cropDetailDTO.getStaffIds() != null) {
             List<Staff> staff = getStaffFromIds(cropDetailDTO.getStaffIds());
             cropDetail.setStaff(staff);
         }
@@ -84,21 +84,21 @@ public class CropDetailServiceImpl implements CropDetailService {
             if (cropDetailDTO.getStaffIds() != null) {
                 List<Staff> staff = getStaffFromIds(cropDetailDTO.getStaffIds());
                 tempCropDetail.get().setStaff(staff);
-            }else {
+            } else {
                 tempCropDetail.get().setStaff(null);
             }
 
             if (cropDetailDTO.getFieldCodes() != null) {
                 List<Field> fields = getFieldsFromCodes(cropDetailDTO.getFieldCodes());
                 tempCropDetail.get().setFields(fields);
-            }else {
+            } else {
                 tempCropDetail.get().setFields(null);
             }
 
             if (cropDetailDTO.getCropCodes() != null) {
                 List<Crop> crops = getCropsFromCodes(cropDetailDTO.getCropCodes());
                 tempCropDetail.get().setCrops(crops);
-            }else {
+            } else {
                 tempCropDetail.get().setCrops(null);
             }
 
@@ -144,13 +144,16 @@ public class CropDetailServiceImpl implements CropDetailService {
     @Transactional
     public void deleteCropDetail(String logCode) {
         Optional<CropDetail> tempCropDetail = cropDetailRepository.findById(logCode);
-        if (tempCropDetail.isPresent()) {
+        if (tempCropDetail.isEmpty()) {
+            throw new CropDetailNotFoundException("Crop detail not found");
+
+        }
+        try {
             imageUtil.deleteImage(tempCropDetail.get().getObservedImage());
             cropDetailRepository.deleteById(logCode);
-        } else {
-            throw new CropDetailNotFoundException("Crop detail not found");
+        } catch (Exception e) {
+            throw new DataPersistFailedException("Failed to delete the crop detail");
         }
-
     }
 
     private List<Field> getFieldsFromCodes(List<String> fieldCodes) {

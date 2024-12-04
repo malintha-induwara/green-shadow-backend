@@ -1,10 +1,7 @@
 package lk.ijse.gdse68.greenshadow.controller;
 
 import lk.ijse.gdse68.greenshadow.dto.CropDetailDTO;
-import lk.ijse.gdse68.greenshadow.exception.CropDetailNotFoundException;
-import lk.ijse.gdse68.greenshadow.exception.CropNotFoundException;
-import lk.ijse.gdse68.greenshadow.exception.FieldNotFoundException;
-import lk.ijse.gdse68.greenshadow.exception.StaffNotFoundException;
+import lk.ijse.gdse68.greenshadow.exception.*;
 import lk.ijse.gdse68.greenshadow.service.CropDetailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -152,7 +149,10 @@ public class CropDetailController {
         } catch (CropDetailNotFoundException e) {
             log.warn("Crop detail not found: {}", logCode);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (Exception e) {
+        } catch (DataPersistFailedException e){
+            log.warn("Failed to delete crop detail: {}", logCode);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }catch (Exception e) {
             log.error("Failed to delete crop detail: {}", logCode, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
