@@ -76,6 +76,7 @@ public class StaffController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','ADMINISTRATIVE','SCIENTIST')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<StaffDTO>> getAllStaff() {
         log.info("Received request to get all staff");

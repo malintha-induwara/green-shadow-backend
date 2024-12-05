@@ -129,6 +129,7 @@ public class FieldController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','ADMINISTRATIVE','SCIENTIST')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<FieldDTO<String>>> getAllFields() {
         log.info("Received request to get all fields");

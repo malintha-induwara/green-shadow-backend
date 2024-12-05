@@ -74,6 +74,7 @@ public class VehicleController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','ADMINISTRATIVE','SCIENTIST')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<VehicleDTO>> getAllVehicles() {
         log.info("Received request to get all vehicles");

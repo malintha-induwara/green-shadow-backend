@@ -94,6 +94,7 @@ public class CropController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','ADMINISTRATIVE','SCIENTIST')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CropDTO<String>>> getAllCrops() {
         log.info("Received request to get all crops");
