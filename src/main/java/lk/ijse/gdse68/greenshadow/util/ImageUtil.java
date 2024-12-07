@@ -1,8 +1,9 @@
 package lk.ijse.gdse68.greenshadow.util;
 
 import lk.ijse.gdse68.greenshadow.enums.ImageType;
+import lk.ijse.gdse68.greenshadow.exception.ImageExtractionFailedException;
+import lk.ijse.gdse68.greenshadow.exception.ImagePersistFailedException;
 import lk.ijse.gdse68.greenshadow.exception.InvalidImageTypeException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +18,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-@Slf4j
 public class ImageUtil {
 
     public static Path IMAGE_DIRECTORY = Paths.get(System.getProperty("user.home"), "Desktop", "LocalS3Bucket").toAbsolutePath().normalize();
@@ -27,9 +27,7 @@ public class ImageUtil {
         if (!Files.exists(IMAGE_DIRECTORY)) {
             try {
                 Files.createDirectories(IMAGE_DIRECTORY);
-                log.info("Directory Created");
             } catch (IOException e) {
-                log.error("Failed to Create directory {}", e.getMessage());
                 throw new RuntimeException(e);
             }
         }
@@ -44,7 +42,7 @@ public class ImageUtil {
                 return null;
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ImageExtractionFailedException("Failed to extract image");
         }
     }
 
@@ -53,7 +51,6 @@ public class ImageUtil {
         if (file.isEmpty()) {
             return null;
         }
-
         //Check whether the file types are valid
         if (!Objects.requireNonNull(file.getOriginalFilename()).endsWith("jpg") &&
                 !Objects.requireNonNull(file.getOriginalFilename()).endsWith("png") &&
@@ -61,25 +58,25 @@ public class ImageUtil {
         ) {
             throw new InvalidImageTypeException("Invalid file type. Only JPG and PNG files are allowed.");
         }
-        //Random UUID
-        String fileName = imageType.toString() +"-" + UUID.randomUUID();
+
+        String fileName = imageType.toString() + "-" + UUID.randomUUID();
         try {
             Files.copy(file.getInputStream(), IMAGE_DIRECTORY.resolve(fileName + "." + Objects.requireNonNull(file.getOriginalFilename()).split("\\.")[1]));
             return fileName;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ImagePersistFailedException("Failed to save image");
         }
     }
 
-    public String updateImage(String imageId,ImageType imageType ,MultipartFile file) {
+    public String updateImage(String imageId, ImageType imageType, MultipartFile file) {
         try {
             Optional<Path> resource = searchImage(imageId);
             if (resource.isPresent()) {
                 Files.delete(resource.get());
             }
-            return saveImage(imageType,file);
+            return saveImage(imageType, file);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ImagePersistFailedException("Failed to update image");
         }
     }
 
@@ -92,8 +89,7 @@ public class ImageUtil {
                 }
             }
         } catch (IOException e) {
-            log.error("Error searching for file: {}", e.getMessage());
-            throw new RuntimeException(e);
+            throw new ImageExtractionFailedException("Failed to search image");
         }
         return Optional.empty();
     }
@@ -105,8 +101,7 @@ public class ImageUtil {
                 Files.delete(resource.get());
             }
         } catch (IOException e) {
-            log.error("Error Deleting file: {}", e.getMessage());
-            throw new RuntimeException(e);
+            throw new ImagePersistFailedException("Failed to delete image");
         }
     }
 }
