@@ -42,7 +42,7 @@ public class ImageUtil {
                 return null;
             }
         } catch (IOException e) {
-            throw new ImageExtractionFailedException("Failed to extract image");
+            throw new ImageExtractionFailedException(imageId);
         }
     }
 
@@ -89,19 +89,19 @@ public class ImageUtil {
                 }
             }
         } catch (IOException e) {
-            throw new ImageExtractionFailedException("Failed to search image");
+            throw new ImageExtractionFailedException(imageId);
         }
         return Optional.empty();
     }
 
-    public void deleteImage(String itemId) {
+    public void deleteImage(String imageId) {
         try {
-            Optional<Path> resource = searchImage(itemId);
+            Optional<Path> resource = searchImage(imageId);
             if (resource.isPresent()) {
                 Files.delete(resource.get());
             }
         } catch (IOException e) {
-            throw new ImagePersistFailedException("Failed to delete image");
+            throw new ImagePersistFailedException("Failed to delete image: "+imageId);
         }
     }
 }

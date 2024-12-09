@@ -1,7 +1,7 @@
 package lk.ijse.gdse68.greenshadow.exception;
 
-public class UserAlreadyExistsExcetipion extends RuntimeException {
-    public UserAlreadyExistsExcetipion(String message) {
+public class UserAlreadyExistsException extends RuntimeException {
+    public UserAlreadyExistsException(String message) {
         super(message);
     }
 }
