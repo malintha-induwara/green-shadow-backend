@@ -110,7 +110,7 @@ public class CropDetailServiceImpl implements CropDetailService {
             updatedCropLogDTO.setObservedImage(imageUtil.getImage(tempCropDetail.get().getObservedImage()));
             return updatedCropLogDTO;
         } else {
-            throw new CropDetailNotFoundException("Crop detail not found");
+            throw new CropDetailNotFoundException(logCode);
         }
 
     }
@@ -123,7 +123,7 @@ public class CropDetailServiceImpl implements CropDetailService {
             cropDetailDTO.setObservedImage(imageUtil.getImage(tempCropDetail.get().getObservedImage()));
             return cropDetailDTO;
         } else {
-            throw new CropDetailNotFoundException("Crop detail not found");
+            throw new CropDetailNotFoundException(logCode);
         }
     }
 
@@ -145,7 +145,7 @@ public class CropDetailServiceImpl implements CropDetailService {
     public void deleteCropDetail(String logCode) {
         Optional<CropDetail> tempCropDetail = cropDetailRepository.findById(logCode);
         if (tempCropDetail.isEmpty()) {
-            throw new CropDetailNotFoundException("Crop detail not found");
+            throw new CropDetailNotFoundException(logCode);
 
         }
         try {

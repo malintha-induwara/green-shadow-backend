@@ -38,7 +38,7 @@ public class VehicleServiceImpl implements VehicleService {
                 if (tempStaff.isPresent()) {
                     tempVehicle.setStaff(tempStaff.get());
                 } else {
-                    throw new StaffNotFoundException("Staff not found");
+                    throw new StaffNotFoundException(vehicleDTO.getStaff());
                 }
             }
             return mapper.convertToVehicleDTO(vehicleRepository.save(tempVehicle));
@@ -53,9 +53,7 @@ public class VehicleServiceImpl implements VehicleService {
             Optional<Vehicle> tempVehicle = vehicleRepository.findById(vehicleId);
 
         if (tempVehicle.isPresent()) {
-
             Vehicle vehicle = tempVehicle.get();
-
             vehicle.setLicensePlateNumber(vehicleDTO.getLicensePlateNumber());
             vehicle.setVehicleCategory(vehicleDTO.getVehicleCategory());
             vehicle.setFuelType(vehicleDTO.getFuelType());
@@ -67,14 +65,14 @@ public class VehicleServiceImpl implements VehicleService {
                 if (tempStaff.isPresent()) {
                     vehicle.setStaff(tempStaff.get());
                 } else {
-                    throw new StaffNotFoundException("Staff not found");
+                    throw new StaffNotFoundException(vehicleDTO.getStaff());
                 }
             } else {
                 vehicle.setStaff(null);
             }
             return mapper.convertToVehicleDTO(tempVehicle.get());
         } else {
-            throw new VehicleNotFoundException("Vehicle not found");
+            throw new VehicleNotFoundException(vehicleId);
         }
     }
 
@@ -84,7 +82,7 @@ public class VehicleServiceImpl implements VehicleService {
         if (tempVehicle.isPresent()) {
             vehicleRepository.deleteById(vehicleId);
         } else {
-            throw new VehicleNotFoundException("Vehicle not found");
+            throw new VehicleNotFoundException(vehicleId);
         }
     }
 
@@ -93,7 +91,7 @@ public class VehicleServiceImpl implements VehicleService {
         if (vehicleRepository.existsById(vehicleId)) {
             return mapper.convertToVehicleDTO(vehicleRepository.getReferenceById(vehicleId));
         } else {
-            throw new VehicleNotFoundException("Vehicle not found");
+            throw new VehicleNotFoundException(vehicleId);
         }
     }
 

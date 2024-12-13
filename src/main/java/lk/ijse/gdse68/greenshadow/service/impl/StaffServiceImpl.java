@@ -56,7 +56,7 @@ public class StaffServiceImpl implements StaffService {
 
             return mapper.convertToStaffDTO(staffRepository.save(tempStaff.get()));
         } else {
-            throw new StaffNotFoundException("Staff not found ");
+            throw new StaffNotFoundException(staffId);
         }
     }
 
@@ -65,13 +65,13 @@ public class StaffServiceImpl implements StaffService {
         Optional<Staff> tempStaff = staffRepository.findById(staffId);
 
         if (tempStaff.isEmpty()) {
-            throw new StaffNotFoundException("Staff not found ");
+            throw new StaffNotFoundException(staffId);
         }
 
         try {
             staffRepository.deleteById(staffId);
         } catch (Exception e) {
-            throw new DataPersistFailedException("Failed to delete the staff");
+            throw new DataPersistFailedException(staffId);
         }
     }
 
@@ -80,7 +80,7 @@ public class StaffServiceImpl implements StaffService {
         if (staffRepository.existsById(staffId)) {
             return mapper.convertToStaffDTO(staffRepository.getReferenceById(staffId));
         } else {
-            throw new StaffNotFoundException("Staff not found ");
+            throw new StaffNotFoundException(staffId);
         }
     }
 

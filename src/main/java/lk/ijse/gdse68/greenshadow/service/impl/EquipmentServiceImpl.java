@@ -44,7 +44,7 @@ public class EquipmentServiceImpl implements EquipmentService {
             if (tempStaff.isPresent()) {
                 tempEquipment.setStaff(tempStaff.get());
             } else {
-                throw new StaffNotFoundException("Staff not found");
+                throw new StaffNotFoundException(equipmentDTO.getStaff());
             }
         }
 
@@ -53,7 +53,7 @@ public class EquipmentServiceImpl implements EquipmentService {
             if (tempField.isPresent()) {
                 tempEquipment.setField(tempField.get());
             } else {
-                throw new FieldNotFoundException("Field not found");
+                throw new FieldNotFoundException(equipmentDTO.getField());
             }
         }
 
@@ -80,7 +80,7 @@ public class EquipmentServiceImpl implements EquipmentService {
                 if (tempStaff.isPresent()) {
                     tempEquipment.get().setStaff(tempStaff.get());
                 } else {
-                    throw new StaffNotFoundException("Staff not found");
+                    throw new StaffNotFoundException(equipmentDTO.getStaff());
                 }
             } else {
                 tempEquipment.get().setStaff(null);
@@ -91,7 +91,7 @@ public class EquipmentServiceImpl implements EquipmentService {
                 if (tempField.isPresent()) {
                     tempEquipment.get().setField(tempField.get());
                 } else {
-                    throw new FieldNotFoundException("Field not found");
+                    throw new FieldNotFoundException(equipmentDTO.getField());
                 }
             } else {
                 tempEquipment.get().setField(null);
@@ -99,7 +99,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 
             return mapper.convertToEquipmentDTO(tempEquipment.get());
         }else {
-            throw new EquipmentNotFoundException("Equipment not found");
+            throw new EquipmentNotFoundException(equipmentId);
         }
     }
 
@@ -108,7 +108,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         if (equipmentRepository.existsById(equipmentId)) {
             equipmentRepository.deleteById(equipmentId);
         } else {
-            throw new EquipmentNotFoundException("Equipment not found");
+            throw new EquipmentNotFoundException(equipmentId);
         }
     }
 
@@ -117,7 +117,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         if (equipmentRepository.existsById(equipmentId)) {
             return mapper.convertToEquipmentDTO(equipmentRepository.getReferenceById(equipmentId));
         }else {
-          throw new EquipmentNotFoundException("Equipment not found");
+          throw new EquipmentNotFoundException(equipmentId);
         }
     }
 

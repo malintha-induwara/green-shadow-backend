@@ -1,10 +1,9 @@
 package lk.ijse.gdse68.greenshadow.service.impl;
 
-import lk.ijse.gdse68.greenshadow.dto.UserDTO;
 import lk.ijse.gdse68.greenshadow.entity.User;
 import lk.ijse.gdse68.greenshadow.enums.Role;
 import lk.ijse.gdse68.greenshadow.exception.DataPersistFailedException;
-import lk.ijse.gdse68.greenshadow.exception.UserAlreadyExistsExcetipion;
+import lk.ijse.gdse68.greenshadow.exception.UserAlreadyExistsException;
 import lk.ijse.gdse68.greenshadow.jwtmodels.JwtAuthResponse;
 import lk.ijse.gdse68.greenshadow.jwtmodels.AuthRequest;
 import lk.ijse.gdse68.greenshadow.repository.UserRepository;
@@ -43,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
     public JwtAuthResponse signUp(AuthRequest signUp) {
         Optional<User> tempUser = userRepository.findById(signUp.getEmail());
         if (tempUser.isPresent()) {
-            throw new UserAlreadyExistsExcetipion("User already exists");
+            throw new UserAlreadyExistsException("User already exists");
         }
         try {
             signUp.setPassword(passwordEncoder.encode(signUp.getPassword()));

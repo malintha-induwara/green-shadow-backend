@@ -42,7 +42,7 @@ public class CropServiceImpl implements CropService {
             if (tempField.isPresent()) {
                 tempCrop.setField(tempField.get());
             } else {
-                throw new FieldNotFoundException("Field not found");
+                throw new FieldNotFoundException(cropDTO.getField());
             }
         }
 
@@ -74,7 +74,7 @@ public class CropServiceImpl implements CropService {
                 if (tempField.isPresent()) {
                     tempCrop.get().setField(tempField.get());
                 } else {
-                    throw new FieldNotFoundException("Field not found");
+                    throw new FieldNotFoundException(cropDTO.getField());
                 }
             } else {
                 tempCrop.get().setField(null);
@@ -90,7 +90,7 @@ public class CropServiceImpl implements CropService {
             updatedCropDTO.setImage(imageUtil.getImage(tempCrop.get().getImage()));
             return updatedCropDTO;
         } else {
-            throw new CropNotFoundException("Crop not found");
+            throw new CropNotFoundException(cropId);
         }
 
     }
@@ -100,9 +100,8 @@ public class CropServiceImpl implements CropService {
     public void deleteCrop(String cropId) {
         Optional<Crop> tempCrop = cropRepository.findById(cropId);
         if (tempCrop.isEmpty()) {
-            throw new CropNotFoundException("Crop not found");
+            throw new CropNotFoundException(cropId);
         }
-
         try {
             imageUtil.deleteImage(tempCrop.get().getImage());
             cropRepository.deleteById(cropId);
@@ -119,7 +118,7 @@ public class CropServiceImpl implements CropService {
             cropDTO.setImage(imageUtil.getImage(tempCrop.get().getImage()));
             return cropDTO;
         } else {
-            throw new CropNotFoundException("Crop not found");
+            throw new CropNotFoundException(cropId);
         }
     }
 

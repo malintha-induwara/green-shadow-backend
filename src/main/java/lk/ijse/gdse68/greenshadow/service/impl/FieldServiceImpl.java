@@ -84,7 +84,7 @@ public class FieldServiceImpl implements FieldService {
             if (fieldDTO.getStaff() != null) {
                 List<Staff> staffFromIds = getStaffFromIds(fieldDTO.getStaff());
                 tempField.get().setStaff(staffFromIds);
-            }else {
+            } else {
                 tempField.get().setStaff(null);
             }
 
@@ -99,21 +99,23 @@ public class FieldServiceImpl implements FieldService {
             updatedFieldDTO.setFieldImage2(imageUtil.getImage(tempField.get().getFieldImage2()));
             return updatedFieldDTO;
         } else {
-            throw new FieldNotFoundException("Field not found");
+            throw new FieldNotFoundException(fieldId);
         }
     }
 
     @Override
     public void deleteField(String fieldId) {
         Optional<Field> tempField = fieldRepository.findById(fieldId);
-        if (tempField.isPresent()) {
+        if (tempField.isEmpty()) {
+            throw new FieldNotFoundException(fieldId);
+        }
+        try {
             imageUtil.deleteImage(tempField.get().getFieldImage1());
             imageUtil.deleteImage(tempField.get().getFieldImage2());
             fieldRepository.delete(tempField.get());
-        } else {
-            throw new FieldNotFoundException("Field not found");
+        } catch (Exception e) {
+            throw new DataPersistFailedException("Failed to delete the field");
         }
-
     }
 
     @Override
@@ -125,7 +127,7 @@ public class FieldServiceImpl implements FieldService {
             fieldDTO.setFieldImage2(imageUtil.getImage(tempField.get().getFieldImage2()));
             return fieldDTO;
         } else {
-            throw new FieldNotFoundException("Field not found");
+            throw new FieldNotFoundException(fieldId);
         }
 
     }
