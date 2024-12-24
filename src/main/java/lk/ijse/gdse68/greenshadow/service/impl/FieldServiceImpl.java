@@ -109,13 +109,9 @@ public class FieldServiceImpl implements FieldService {
         if (tempField.isEmpty()) {
             throw new FieldNotFoundException(fieldId);
         }
-        try {
-            imageUtil.deleteImage(tempField.get().getFieldImage1());
-            imageUtil.deleteImage(tempField.get().getFieldImage2());
-            fieldRepository.delete(tempField.get());
-        } catch (Exception e) {
-            throw new DataPersistFailedException("Failed to delete the field");
-        }
+        imageUtil.deleteImage(tempField.get().getFieldImage1());
+        imageUtil.deleteImage(tempField.get().getFieldImage2());
+        fieldRepository.delete(tempField.get());
     }
 
     @Override

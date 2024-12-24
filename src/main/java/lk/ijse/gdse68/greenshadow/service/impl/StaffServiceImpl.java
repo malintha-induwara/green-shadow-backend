@@ -67,12 +67,7 @@ public class StaffServiceImpl implements StaffService {
         if (tempStaff.isEmpty()) {
             throw new StaffNotFoundException(staffId);
         }
-
-        try {
-            staffRepository.deleteById(staffId);
-        } catch (Exception e) {
-            throw new DataPersistFailedException(staffId);
-        }
+        staffRepository.deleteById(staffId);
     }
 
     @Override

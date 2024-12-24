@@ -102,12 +102,8 @@ public class CropServiceImpl implements CropService {
         if (tempCrop.isEmpty()) {
             throw new CropNotFoundException(cropId);
         }
-        try {
-            imageUtil.deleteImage(tempCrop.get().getImage());
-            cropRepository.deleteById(cropId);
-        } catch (Exception e) {
-            throw new DataPersistFailedException("Failed to delete the crop");
-        }
+        imageUtil.deleteImage(tempCrop.get().getImage());
+        cropRepository.deleteById(cropId);
     }
 
     @Override
